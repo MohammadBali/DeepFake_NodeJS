@@ -41,15 +41,29 @@ const postSchema= new mongoose.Schema({
 }, {timestamps:true,});
 
 
-postSchema.methods.LikePost= async function (userID, postID) {
+postSchema.static.LikePost= async function (userID, postID) {
     try
     {
         const p = await Post.findOne(postID);
         if (!p)
         {
+            console.log(`No Such post ${postID},  has been found`);
             return null;
         }
 
+        //Find if the user has already liked this post
+        for(let e in p.likes)
+        {
+            if(e.owner === userID)
+            {
+                p.likes.splice(p.likes.indexOf(e)); //Remove his like
+
+                console.log("User has already Liked this post, removing it...");
+                await p.save();
+                return p;
+            }
+        }
+        console.log("Adding like to this post");
         p.likes=p.likes.concat({'owner':userID});
         await p.save();
         return p;
@@ -61,7 +75,8 @@ postSchema.methods.LikePost= async function (userID, postID) {
     }
 };
 
-postSchema.methods.AddComment= async function(userID, postID, comment){
+
+postSchema.static.AddComment= async function(userID, postID, comment){
     console.log('In Adding a Comment...');
 
     try

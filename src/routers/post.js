@@ -3,7 +3,6 @@ import {auth} from "../middleware/auth.js";
 import {Post} from "../models/post.js";
 
 const router= express.Router();
-
 //Add Post
 router.post('/addPost',auth, async (req, res)=>{
 

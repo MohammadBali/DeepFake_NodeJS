@@ -5,6 +5,7 @@ import {Inquiry} from "./inquiry.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import constants from "../shared/constants.js";
+import {Post} from "./post.js";
 
 
 const userSchema= new mongoose.Schema({
@@ -114,6 +115,7 @@ userSchema.pre('findOneAndDelete', async function(next)
 
     console.log(`User ID to be Deleted: ${u._id}`);
     await Inquiry.deleteMany({owner:u._id});
+    await Post.deleteMany({owner:u._id});
     next();
 });
 
