@@ -1,4 +1,4 @@
-import mongoose, {Schema} from "mongoose";
+import mongoose from "mongoose";
 import validator from "validator";
 
 import {Inquiry} from "./inquiry.js";

@@ -1,6 +1,5 @@
 import express from "express";
 import {auth} from "../middleware/auth.js";
-import {Inquiry} from "../models/inquiry.js";
 import {Post} from "../models/post.js";
 
 const router= express.Router();

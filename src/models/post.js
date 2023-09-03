@@ -1,4 +1,4 @@
-import mongoose, {Schema} from "mongoose";
+import mongoose from "mongoose";
 import {Inquiry} from "./inquiry.js";
 
 const postSchema= new mongoose.Schema({
