@@ -85,6 +85,15 @@ userSchema.virtual('inquiries',{
 });
 
 
+//Telling Mongoose that the user is foreign key for Posts.
+userSchema.virtual('posts',{
+    ref:'Post',
+    localField:'_id',
+    foreignField:'owner',
+});
+
+
+
 //Hashing Password before Saving
 userSchema.pre('save',async function (next){
     const user=this;
@@ -151,5 +160,6 @@ userSchema.methods.toJSON= function()
 
     return userObject;
 };
+
 
 export const User= mongoose.model('User', userSchema);
