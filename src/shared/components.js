@@ -1,4 +1,7 @@
 import {Post} from "../models/post.js";
+import jwt from "jsonwebtoken";
+import constants from "./constants.js";
+import {User} from "../models/user.js";
 
 //HANDLING REAL_TIME CONNECTIONS USING WEBSOCKETS.
 async function analyseMessageType(message)
@@ -114,4 +117,30 @@ async function deleteComment({commentID, postID})
         return e;
     }
 }
-export default {analyseMessageType}
+
+
+
+//-------------------------------------------------
+
+export async function wsAuth (message)
+{
+    try{
+        const token= message.token;
+
+        const data= jwt.verify(token,constants.SignKey);
+
+        const user= await User.findOne({_id:data._id, 'tokens.token':token }) //Find a user with his ID and with this Token, if found => Authenticated
+
+        if(!user)
+        {
+            return false;
+        }
+
+        console.log(`${user._id} is Authenticated `);
+        return true;
+    }catch (e) {
+        return false;
+    }
+}
+
+export default {analyseMessageType, wsAuth}

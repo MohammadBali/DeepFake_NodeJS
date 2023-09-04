@@ -1,4 +1,6 @@
 import mongoose, {Schema} from "mongoose";
+import {Post} from "./post.js";
+import {User} from "./user.js";
 
 const inquirySchema= new mongoose.Schema({
     name:{
@@ -42,6 +44,17 @@ const inquirySchema= new mongoose.Schema({
     }
 
 },{timestamps:true});
+
+
+//Delete Posts of this Inquiry when the inquiry gets deleted.
+inquirySchema.pre('findOneAndDelete', async function(next)
+{
+    const inquiry= await Inquiry.findOne(this.getQuery());
+
+    console.log(`Inquiry ID to be Deleted: ${inquiry._id}`);
+    await Post.deleteMany({inquiry:inquiry._id});
+    next();
+});
 
 
 export const Inquiry= mongoose.model('Inquiry', inquirySchema);
