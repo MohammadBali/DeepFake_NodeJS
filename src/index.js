@@ -26,38 +26,46 @@ app.use(postRouter);
 
 //Get the WebSocket info
 let socketManager=expressWebSocket.getWss('/webSocket');
-wsApp.ws('/webSocket',function (ws,req){
+wsApp.ws('/webSocket',function (ws){ //was (ws,req).
 
-    console.log('Connected to Web Socket');
+    console.log(`Client has Connected to Web Socket`);
 
     //On Message Received
     ws.on('message', async (message) => {
         const parsedMessage = JSON.parse(message);
 
-        console.log(`IN MESSAGE, Received: ${message}`);
+        //console.log(`IN MESSAGE, Received: ${message}`);
 
         const data = await components.analyseMessageType(parsedMessage);
 
         //Data returned is Post => Pass it to client
         if (data instanceof Post) {
-            if (parsedMessage.type === 'comment' || parsedMessage.type === 'like' || parsedMessage.type === 'deleteComment') {
+            if (parsedMessage.type === 'comment') {
                 socketManager.clients.forEach(function (client) {
                     if (client.readyState === ws.OPEN) {
-                        client.send(JSON.stringify(data)); // we can write {type:'comment', data:data} then stringify it ??
+                        client.send(JSON.stringify({data:data, type:'Add_Comment'})); // we can write {type:'comment', data:data} then stringify it ??
                     }
                 });
             }
 
-            // if (parsedMessage.type === 'like') {
-            //     socketManager.clients.forEach(function (client) {
-            //         if (client.readyState === ws.OPEN) {
-            //             client.send(JSON.stringify(data)); // we can write {type:'like', data:data} then stringify it ??
-            //         }
-            //     });
-            // }
+            if (parsedMessage.type === 'like') {
+                socketManager.clients.forEach(function (client) {
+                    if (client.readyState === ws.OPEN) {
+                        client.send(JSON.stringify({data:data, type:'Like'})); // we can write {type:'like', data:data} then stringify it ??
+                    }
+                });
+            }
+
+            if (parsedMessage.type === 'deleteComment') {
+                socketManager.clients.forEach(function (client) {
+                    if (client.readyState === ws.OPEN) {
+                        client.send(JSON.stringify({data:data, type:'Delete_Comment'})); // we can write {type:'like', data:data} then stringify it ??
+                    }
+                });
+            }
         }
 
-        //Data Returned is -1 => No Post has been found and ONLY SEND IT TO THE CLIENT WHO SEND THE REQUEST => client===ws
+        //Data Returned is -1 or -2 => No Post has been found and ONLY SEND IT TO THE CLIENT WHO SEND THE REQUEST => client===ws
         else if (Number.isInteger(data)) {
             socketManager.clients.forEach(function (client) {
                 if (client===ws && client.readyState === ws.OPEN) {
@@ -79,7 +87,7 @@ wsApp.ws('/webSocket',function (ws,req){
     });
 
     ws.on('close', () => {
-        console.log('Client disconnected');
+        console.log(`Client disconnected`);
     });
 });
 
