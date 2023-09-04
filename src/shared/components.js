@@ -21,6 +21,11 @@ async function analyseMessageType(message)
         return await AddComment({userID:message.userID, postID:message.postID, comment:message.comment});
     }
 
+    if(message.type === 'deletePost')
+    {
+        return await deletePost({postID:message.postID, userID:message.userID});
+    }
+
     return -2;
 }
 
@@ -118,10 +123,27 @@ async function deleteComment({commentID, postID})
     }
 }
 
+//Delete a Post
+async function deletePost({postID, userID})
+{
 
+    try{
+        const p= await Post.findOneAndDelete({_id:postID, owner:userID});
+        if(!p)
+        {
+            return -1;
+        }
+
+        return p;
+    }
+    catch (e) {
+        console.log(`COULDN'T DELETE POST, ${e}`);
+        return e;
+    }
+}
 
 //-------------------------------------------------
-
+//Authentication for WebSockets
 export async function wsAuth (message)
 {
     try{

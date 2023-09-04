@@ -55,7 +55,7 @@ wsApp.ws('/webSocket',function (ws){ //was (ws,req).
                 if (parsedMessage.type === 'like') {
                     socketManager.clients.forEach(function (client) {
                         if (client.readyState === ws.OPEN) {
-                            client.send(JSON.stringify({data:data, type:'Like'})); // we can write {type:'like', data:data} then stringify it ??
+                            client.send(JSON.stringify({data:data, type:'Like'}));
                         }
                     });
                 }
@@ -63,7 +63,16 @@ wsApp.ws('/webSocket',function (ws){ //was (ws,req).
                 if (parsedMessage.type === 'deleteComment') {
                     socketManager.clients.forEach(function (client) {
                         if (client.readyState === ws.OPEN) {
-                            client.send(JSON.stringify({data:data, type:'Delete_Comment'})); // we can write {type:'like', data:data} then stringify it ??
+                            client.send(JSON.stringify({data:data, type:'Delete_Comment'}));
+                        }
+                    });
+                }
+
+
+                if (parsedMessage.type === 'deletePost') {
+                    socketManager.clients.forEach(function (client) {
+                        if (client.readyState === ws.OPEN) {
+                            client.send(JSON.stringify({data:data, type:'Delete_Post'}));
                         }
                     });
                 }

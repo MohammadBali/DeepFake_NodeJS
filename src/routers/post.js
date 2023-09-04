@@ -43,7 +43,6 @@ router.get('/posts',auth, async (req, res)=>{
 
 
 //Get User's Posts
-
 router.get('/posts/me', auth, async(req,res)=>{
     try
     {
@@ -82,12 +81,11 @@ router.get('/likedPosts',auth, async (req,res)=>{
     }
 });
 
-
-
+//Delete a Post
 router.delete('/deletePost/:id',auth,async (req,res) =>
 {
     console.log('In Deleting a Post');
-    const id= req.params.id || 1;
+    const id= req.params.id ;
 
     try{
         const p= await Post.findOneAndDelete({_id:id, owner:req.user._id});
