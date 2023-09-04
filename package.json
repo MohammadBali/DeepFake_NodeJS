@@ -21,6 +21,7 @@
     "express-ws": "^5.0.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.4.2",
-    "validator": "^13.11.0"
+    "validator": "^13.11.0",
+    "ws": "^8.13.0"
   }
 }
