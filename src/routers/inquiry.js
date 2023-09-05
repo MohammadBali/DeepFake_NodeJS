@@ -88,7 +88,7 @@ router.get('/inquiries',async (req,res)=>{
     try
     {
         const q= await Inquiry.find();
-        res.status(200).send(q);
+        res.status(200).send({inquiries:q});
     }
     catch (e) {
         res.status(500).send(e);

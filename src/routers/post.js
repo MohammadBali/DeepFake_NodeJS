@@ -31,9 +31,19 @@ router.get('/posts',auth.userAuth, async (req, res)=>{
 
     try
     {
-        const p=await Post.find();
+        const page = parseInt(req.query.page) || 1; // Current page number, default to 1
+        const limit = parseInt(req.query.limit) || 10; // Number of posts per page, default to 10
 
-        res.status(200).send(p);
+        // Calculate the skip value
+        const skip = (page - 1) * limit;
+
+        //Criteria, Projection is Null , Options
+        const posts=await Post.find({},null,{limit:limit, skip:skip, sort:{createdAt:-1} });
+
+        //Calculate the pagination and return it in a Map.
+        const pagination= await Post.paginationCalculator(page,limit);
+
+        res.status(200).send({posts,pagination});
     }
     catch (e) {
         console.log(`ERROR WHILE GETTING ALL POSTS IN /getPosts, ${e}`);
@@ -73,7 +83,7 @@ router.get('/likedPosts',auth.userAuth, async (req, res)=>{
             return res.status(200).send({message:'This User has not liked any posts'});
         }
 
-        res.status(200).send(p);
+        res.status(200).send({posts:p});
     }
     catch (e) {
         console.log(`COULD NOT GET POSTS LIKED BY USER, ${e}`);

@@ -4,9 +4,12 @@ import validator from "validator";
 import {Inquiry} from "./inquiry.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+
 import constants from "../shared/constants.js";
 import {Post} from "./post.js";
+import moment from "moment";
 
+import uniqueValidator from "mongoose-unique-validator";
 
 const userSchema= new mongoose.Schema({
     name:{
@@ -28,6 +31,19 @@ const userSchema= new mongoose.Schema({
         cast:false,
         required:true,
         trim:true,
+        validate(value)
+        {
+            return moment(value,'DD/MM/YYYY').isValid();
+        },
+
+        set: function (value)
+        {
+            const date = moment(value, 'DD/MM/YYYY', true);
+            if (date.isValid()) {
+                return date.format('DD/MM/YYYY');
+            }
+            return value;
+        }
     },
 
     email:{
@@ -78,6 +94,9 @@ const userSchema= new mongoose.Schema({
     }
 
 },{timestamps:true});
+
+
+userSchema.plugin(uniqueValidator);
 
 //Telling Mongoose that the user is foreign key for Inquiry.
 userSchema.virtual('inquiries',{

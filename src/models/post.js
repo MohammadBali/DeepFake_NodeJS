@@ -42,61 +42,30 @@ const postSchema= new mongoose.Schema({
 }, {timestamps:true,});
 
 
-// postSchema.static.LikePost= async function (userID, postID) {
-//     try
-//     {
-//         const p = await Post.findOne(postID);
-//         if (!p)
-//         {
-//             console.log(`No Such post ${postID},  has been found`);
-//             return null;
-//         }
-//
-//         //Find if the user has already liked this post
-//         for(let e in p.likes)
-//         {
-//             if(e.owner === userID)
-//             {
-//                 p.likes.splice(p.likes.indexOf(e)); //Remove his like
-//
-//                 console.log("User has already Liked this post, removing it...");
-//                 await p.save();
-//                 return p;
-//             }
-//         }
-//         console.log("Adding like to this post");
-//         p.likes=p.likes.concat({'owner':userID});
-//         await p.save();
-//         return p;
-//     }
-//
-//     catch (e) {
-//         console.log(`ERROR WHILE LIKING A POST, ${e}`);
-//         return false;
-//     }
-// };
-//
-//
-// postSchema.static.AddComment= async function(userID, postID, comment){
-//     console.log('In Adding a Comment...');
-//
-//     try
-//     {
-//         const p= await Post.find(postID);
-//         if(!p)
-//         {
-//             console.log('No Such Post was Found');
-//             return null;
-//         }
-//
-//         p.comments=p.comments.concat({'comment':comment, 'owner':userID});
-//         await p.save();
-//         return p;
-//     }
-//     catch (e) {
-//         console.log(`ERROR WHILE ADDING A COMMENT, ${e}`);
-//         return false;
-//     }
-// };
 
+//Calculate the Pagination and return the data
+postSchema.statics.paginationCalculator= async function (page,limit)
+{
+    // Count the total number of posts
+    const totalCount = await Post.countDocuments();
+
+    // Calculate the total number of pages
+    const totalPages = Math.ceil(totalCount / limit);
+
+    // Build pagination links
+    const pagination = {
+        currentPage: page,
+        totalPages,
+    };
+
+    if (page < totalPages) {
+        pagination.nextPage = `?page=${page + 1}&limit=${limit}`;  //  /posts?page=${page + 1}&limit=${limit}
+    }
+
+    if (page > 1) {
+        pagination.prevPage = `?page=${page - 1}&limit=${limit}`; // /posts?page=${page - 1}&limit=${limit}
+    }
+
+    return pagination;
+}
 export const Post= mongoose.model('Post',postSchema);
