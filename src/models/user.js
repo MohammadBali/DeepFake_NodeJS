@@ -74,6 +74,7 @@ const userSchema= new mongoose.Schema({
         required:false,
         cast:false,
         trim:true,
+        default:'avatar1.jpg',
     }
 
 },{timestamps:true});

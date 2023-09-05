@@ -1,10 +1,10 @@
 import express from "express";
-import {auth} from "../middleware/auth.js";
+import auth from "../middleware/auth.js";
 import {Post} from "../models/post.js";
 
 const router= express.Router();
 //Add Post
-router.post('/addPost',auth, async (req, res)=>{
+router.post('/addPost',auth.userAuth, async (req, res)=>{
 
     const p= new Post(req.body);
 
@@ -26,7 +26,7 @@ router.post('/addPost',auth, async (req, res)=>{
 
 
 //Get All Available Posts
-router.get('/posts',auth, async (req, res)=>{
+router.get('/posts',auth.userAuth, async (req, res)=>{
     console.log('Getting ALl Posts...');
 
     try
@@ -43,7 +43,7 @@ router.get('/posts',auth, async (req, res)=>{
 
 
 //Get User's Posts
-router.get('/posts/me', auth, async(req,res)=>{
+router.get('/posts/me', auth.userAuth, async(req, res)=>{
     try
     {
         await req.user.populate({
@@ -61,7 +61,7 @@ router.get('/posts/me', auth, async(req,res)=>{
 
 
 //Get Posts that a User has Liked
-router.get('/likedPosts',auth, async (req,res)=>{
+router.get('/likedPosts',auth.userAuth, async (req, res)=>{
 
     console.log('Getting Posts like by a user through ID');
 
@@ -82,7 +82,7 @@ router.get('/likedPosts',auth, async (req,res)=>{
 });
 
 //Delete a Post
-router.delete('/deletePost/:id',auth,async (req,res) =>
+router.delete('/deletePost/:id',auth.userAuth,async (req, res) =>
 {
     console.log('In Deleting a Post');
     const id= req.params.id ;
@@ -103,7 +103,7 @@ router.delete('/deletePost/:id',auth,async (req,res) =>
 });
 
 //Like a Post
-router.post('/AddLike',auth, async(req,res)=>{
+router.post('/AddLike',auth.userAuth, async(req, res)=>{
     console.log('Adding Like to a Post');
     try {
 

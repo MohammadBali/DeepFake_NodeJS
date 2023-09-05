@@ -1,6 +1,6 @@
 import express from "express";
 import {User} from "../models/user.js";
-import {auth} from "../middleware/auth.js";
+import auth from "../middleware/auth.js";
 
 
 const router= express.Router();
@@ -24,7 +24,7 @@ router.post('/addUser',async (req,res)=>{
 
 
 //Get All Users,  Parameters are: PATH - Middleware - Handlers
-router.get('/users', auth, async (req, res) => {
+router.get('/users', auth.userAuth, async (req, res) => {
     try {
         const u= await User.find();
         res.status(200).send(u)
@@ -35,8 +35,8 @@ router.get('/users', auth, async (req, res) => {
 
 
 //Get Your User Data,  Parameters are: PATH - Middleware - Handlers
-router.get('/users/me', auth, async (req, res) => {
-    res.status(201).send(req.user); // The User came from request since we did it in the auth function, we did set the req.user to the user that was found.
+router.get('/users/me', auth.userAuth, async (req, res) => {
+    res.status(201).send(req.user); // The User came from request since we did it in the auth.auth function, we did set the req.user to the user that was found.
 });
 
 //Get a Specific User with ID
@@ -56,7 +56,7 @@ router.get('/users/:id',async (req, res) => {
 });
 
 //Update a User
-router.patch('/users/me', auth, async (req, res) => {
+router.patch('/users/me', auth.userAuth, async (req, res) => {
     const updates= Object.keys(req.body);
     const allowedUpdates=['name','password','email'];
 
@@ -90,8 +90,8 @@ router.patch('/users/me', auth, async (req, res) => {
 
 });
 
-//Delete a User, uses middleware for authentication
-router.delete('/users/delete', auth, async (req, res) => {
+//Delete a User, uses middleware for auth.authentication
+router.delete('/users/delete', auth.userAuth, async (req, res) => {
     try {
         const u = await User.findOneAndDelete(req.user._id);
         if (!u) {
@@ -119,7 +119,7 @@ router.post('/users/login', async (req,res)=>{
 });
 
 //Logout a User
-router.post('/users/logout',auth, async(req,res)=>{
+router.post('/users/logout',auth.userAuth, async(req, res)=>{
 
     try{
         req.user.tokens = req.user.tokens.filter((token)=>{
@@ -135,7 +135,7 @@ router.post('/users/logout',auth, async(req,res)=>{
 });
 
 //Logout of all Tokens for a User
-router.post('/users/logoutAll',auth, async (req,res)=>{
+router.post('/users/logoutAll',auth.userAuth, async (req, res)=>{
 
     try{
         req.user.tokens=[];

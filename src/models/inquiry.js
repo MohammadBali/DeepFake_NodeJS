@@ -17,8 +17,8 @@ const inquirySchema= new mongoose.Schema({
         trim:true,
         lowercase:true,
         enum:{
-            values:['text','audio'],
-            message:"Type Does not match text or audio",
+            values:['text','audio','image'],
+            message:"Type Does not match text, image or audio",
         },
     },
 

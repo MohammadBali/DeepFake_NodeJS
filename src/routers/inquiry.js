@@ -1,12 +1,21 @@
 import express from "express";
-import {auth} from "../middleware/auth.js";
+import auth from "../middleware/auth.js";
 import {Inquiry} from "../models/inquiry.js";
 
 const router= express.Router();
 
-//Add an Inquiry
-router.post('/addInquiry',async (req, res)=>{
-    const inquiry= new Inquiry(req.body);
+//Add a Text Inquiry, expecting an image which keyword name is 'text'
+router.post('/addTextInquiry',auth.userAuth, auth.textAuth.single('text'),async (req, res)=>{
+
+    const textBuffer= req.file.buffer;
+
+    const inquiry= new Inquiry({
+        name:req.body.name,
+        type:req.body.type,
+        data:textBuffer, //Data is String
+        owner:req.user._id,
+        result:req.body.result,
+    });
 
     try{
         await inquiry.save();
@@ -17,7 +26,61 @@ router.post('/addInquiry',async (req, res)=>{
         console.log(`Could not Add Inquiry, ${e}`);
         res.status(500).send(e);
     }
+}, (error, req, res, next)=> {
+    res.status(400).send({error: error.message});
 });
+
+//Add an Image Inquiry, expecting an image which keyword name is 'image'
+router.post('/addImageInquiry',auth.userAuth, auth.imageAuth.single('image'), async (req, res)=>{
+    const imageBuffer= req.file.buffer;
+    try{
+        const inquiry= new Inquiry({
+            name:req.body.name,
+            type:req.body.type,
+            data:imageBuffer, //Data is ImageBuffer
+            owner:req.user._id,
+            result:req.body.result,
+        });
+
+        await inquiry.save();
+
+        res.status(201).send({inquiry});
+    }
+    catch (e) {
+        console.log(`Could not Add Image Inquiry, ${e}`);
+        res.status(500).send(e);
+    }
+}, (error, req, res, next)=>
+{
+    res.status(400).send({error:error.message}); //Error Handler for Multer too.
+});
+
+
+//Add an Image Audio, expecting an image which keyword name is 'image'
+router.post('/addAudioInquiry',auth.userAuth, auth.audioAuth.single('audio'), async (req, res)=>{
+
+    const audioBuffer= req.file.buffer;
+    try{
+        const inquiry= new Inquiry({
+            name:req.body.name,
+            type:req.body.type,
+            data:audioBuffer, //Data is ImageBuffer
+            owner:req.user._id,
+            result:req.body.result,
+        });
+
+        await inquiry.save();
+
+        res.status(201).send({inquiry});
+    }
+    catch (e) {
+        console.log(`Could not Add Audio Inquiry, ${e}`);
+        res.status(500).send(e);
+    }
+}, (error, req, res, next)=> {
+    res.status(400).send({error: error.message});
+});
+
 
 
 //Send All Inquiries in Database
@@ -33,7 +96,7 @@ router.get('/inquiries',async (req,res)=>{
 });
 
 //Get User's Inquiries
-router.get('/inquiries/me',auth, async (req,res)=>{
+router.get('/inquiries/me',auth.userAuth, async (req, res)=>{
     console.log('in Sending User\'s inquiries ');
     try{
         await req.user.populate({
@@ -51,7 +114,7 @@ router.get('/inquiries/me',auth, async (req,res)=>{
 
 
 //Delete an Inquiry
-router.delete('inquiries/delete/:id',auth,async (req,res)=>{
+router.delete('inquiries/delete/:id',auth.userAuth,async (req, res)=>{
     const id= req.params.id;
     try{
         const inquiry= await Inquiry.findOneAndDelete({_id:id, owner:req.user._id});

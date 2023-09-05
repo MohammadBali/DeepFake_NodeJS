@@ -143,6 +143,7 @@ async function deletePost({postID, userID})
 }
 
 //-------------------------------------------------
+
 //Authentication for WebSockets
 export async function wsAuth (message)
 {
