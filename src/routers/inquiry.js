@@ -7,17 +7,18 @@ const router= express.Router();
 //Add a Text Inquiry, expecting an image which keyword name is 'text'
 router.post('/addTextInquiry',auth.userAuth, auth.textAuth.single('text'),async (req, res)=>{
 
-    const textBuffer= req.file.buffer;
-
-    const inquiry= new Inquiry({
-        name:req.body.name,
-        type:req.body.type,
-        data:textBuffer, //Data is String
-        owner:req.user._id,
-        result:req.body.result,
-    });
 
     try{
+        const textBuffer= req.file.buffer;
+
+        const inquiry= new Inquiry({
+            name:req.body.name,
+            type:req.body.type,
+            data:textBuffer, //Data is String
+            owner:req.user._id,
+            result:req.body.result,
+        });
+
         await inquiry.save();
 
         res.status(201).send({inquiry});
@@ -32,8 +33,10 @@ router.post('/addTextInquiry',auth.userAuth, auth.textAuth.single('text'),async 
 
 //Add an Image Inquiry, expecting an image which keyword name is 'image'
 router.post('/addImageInquiry',auth.userAuth, auth.imageAuth.single('image'), async (req, res)=>{
-    const imageBuffer= req.file.buffer;
+
     try{
+        const imageBuffer= req.file.buffer;
+
         const inquiry= new Inquiry({
             name:req.body.name,
             type:req.body.type,
@@ -59,8 +62,9 @@ router.post('/addImageInquiry',auth.userAuth, auth.imageAuth.single('image'), as
 //Add an Image Audio, expecting an image which keyword name is 'image'
 router.post('/addAudioInquiry',auth.userAuth, auth.audioAuth.single('audio'), async (req, res)=>{
 
-    const audioBuffer= req.file.buffer;
+
     try{
+        const audioBuffer= req.file.buffer;
         const inquiry= new Inquiry({
             name:req.body.name,
             type:req.body.type,
