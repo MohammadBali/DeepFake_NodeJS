@@ -91,7 +91,18 @@ const userSchema= new mongoose.Schema({
         cast:false,
         trim:true,
         default:'avatar1.jpg',
-    }
+    },
+
+    // isVerified:{
+    //     type:Boolean,
+    //     required:false,
+    //     default:false,
+    // },
+    //
+    // OTP:{
+    //     type:Number,
+    //     required:false,
+    // },
 
 },{timestamps:true});
 

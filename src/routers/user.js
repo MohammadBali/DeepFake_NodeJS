@@ -2,7 +2,6 @@ import express from "express";
 import {User} from "../models/user.js";
 import auth from "../middleware/auth.js";
 
-
 const router= express.Router();
 
 //Add a new User

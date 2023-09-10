@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import constants from "./constants.js";
 import {User} from "../models/user.js";
 
+
 //HANDLING REAL_TIME CONNECTIONS USING WEBSOCKETS.
 async function analyseMessageType(message)
 {
@@ -165,5 +166,34 @@ export async function wsAuth (message)
         return false;
     }
 }
+
+
+
+//------------------------------------------------
+
+// import prandom from "prandom";
+//
+// import { MailerSend, EmailParams, Sender, Recipient } from "mailersend";
+//
+//
+// //Generate Random OTP passwords.
+//
+// function generateOTP()
+// {
+//     return prandom.otp(6); //Generate Random OTP, it's length is 6 characters.
+// }
+//
+// const mailerSend= new MailerSend({apiKey:'mlsn.d25709e1ebbf021745bb3c4f46796c3e2e0a8751c3f3befe330e3225a12212e1'});
+// const sentFrom = new Sender("mhd@deepfake.com", "Mohammad");
+// const recipients = [
+//     new Recipient("bluntgeorge348@google.com", "Blunt"),
+// ];
+//
+// async function sendMail() {
+//     const e = new EmailParams().setFrom(sentFrom).setTo(recipients).setSubject("This is Test 1").setText(`${generateOTP()}`);
+//
+//     await mailerSend.email.send(e);
+// }
+
 
 export default {analyseMessageType, wsAuth}
