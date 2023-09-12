@@ -2,7 +2,8 @@ import {Post} from "../models/post.js";
 import jwt from "jsonwebtoken";
 import constants from "./constants.js";
 import {User} from "../models/user.js";
-
+import request from "postman-request";
+import {News} from "../models/news.js";
 
 //HANDLING REAL_TIME CONNECTIONS USING WEBSOCKETS.
 async function analyseMessageType(message)
@@ -196,4 +197,50 @@ export async function wsAuth (message)
 // }
 
 
-export default {analyseMessageType, wsAuth}
+
+//----------------------------------------------------
+
+//Get AI News and Store it in database.
+async function getNews()
+{
+    console.log('In Getting News...');
+
+    request({url:constants.gNewsURL, json:true,}, async (error, response) => {
+        if (error) {
+            console.log(`ERROR WHILE GETTING NEWS, ${error.toString()}`);
+        } else if (response) {
+            console.log(`GOT DATA, ${response.body.totalArticles}`);
+            await storeNews(response);
+        }
+    });
+
+}
+//Store the data in database.
+async function storeNews(result)
+{
+    console.log('Got Data to Store');
+
+    for (const value of result.body.articles) {
+        const n= new News({
+            title:value.title,
+            description:value.description,
+            content:value.content,
+            url:value.url,
+            image:value.image,
+            date:value.publishedAt,
+        });
+
+        try
+        {
+            await n.save();
+        }
+        catch (e) {
+            console.log(`ERROR WHILE STORING NEWS,${e.toString()}`);
+
+        }
+
+    }
+
+}
+
+export default {analyseMessageType, wsAuth, getNews}

@@ -4,10 +4,13 @@ import mongoose from './db/mongoose.js';
 import userRouter from './routers/user.js';
 import inquiryRouter from './routers/inquiry.js';
 import postRouter from "./routers/post.js";
+import newsRouter from "./routers/news.js";
 
 import expressWs from 'express-ws';
 import components from './shared/components.js';
 import {Post} from "./models/post.js";
+
+import timedEvents from "./shared/timedEvents.js";  //Get News Daily
 
 const app= express();
 const port=3000;
@@ -22,6 +25,8 @@ app.use(userRouter);
 app.use(inquiryRouter);
 
 app.use(postRouter);
+
+app.use(newsRouter);
 
 
 //Get the WebSocket info
@@ -125,6 +130,8 @@ wsApp.ws('/webSocket',function (ws){ //was (ws,req).
         console.log(`Client disconnected`);
     });
 });
+
+
 
 app.listen(port,()=>
 {
