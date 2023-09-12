@@ -2,8 +2,8 @@ import {Post} from "../models/post.js";
 import jwt from "jsonwebtoken";
 import constants from "./constants.js";
 import {User} from "../models/user.js";
-import request from "postman-request";
 import {News} from "../models/news.js";
+import axios from "axios";
 
 //HANDLING REAL_TIME CONNECTIONS USING WEBSOCKETS.
 async function analyseMessageType(message)
@@ -205,13 +205,22 @@ async function getNews()
 {
     console.log('In Getting News...');
 
-    request({url:constants.gNewsURL, json:true,}, async (error, response) => {
-        if (error) {
-            console.log(`ERROR WHILE GETTING NEWS, ${error.toString()}`);
-        } else if (response) {
-            console.log(`GOT DATA, ${response.body.totalArticles}`);
-            await storeNews(response);
-        }
+    // request({url:constants.gNewsURL, json:true,}, async (error, response) => {
+    //     if (error) {
+    //         console.log(`ERROR WHILE GETTING NEWS, ${error.toString()}`);
+    //     } else if (response) {
+    //         console.log(`GOT DATA, ${response.body.totalArticles}`);
+    //         await storeNews(response);
+    //     }
+    // });
+
+    axios.get(constants.gNewsURL).then(async (result) => {
+        console.log(`Got Data, ${result.data}`);
+        await storeNews(result);
+
+    }).catch((error)=>
+    {
+        console.log(`ERROR WHILE GETTING NEWS, ${error.message}`);
     });
 
 }
@@ -220,7 +229,7 @@ async function storeNews(result)
 {
     console.log('Got Data to Store');
 
-    for (const value of result.body.articles) {
+    for (const value of result.data.articles) {
         const n= new News({
             title:value.title,
             description:value.description,
@@ -233,6 +242,7 @@ async function storeNews(result)
         try
         {
             await n.save();
+            console.log('Saved Successfully');
         }
         catch (e) {
             console.log(`ERROR WHILE STORING NEWS,${e.toString()}`);

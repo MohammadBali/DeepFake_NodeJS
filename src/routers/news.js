@@ -6,9 +6,8 @@ const router= express.Router();
 
 router.get('/getNews', async(req,res)=>{
 
-    const n= await News.find({},null,{sort: {publishedAt:-1, limit:10} });
-
     try{
+        const n= await News.find({},null,{sort: {publishedAt:-1}, limit:10 });
         res.status(200).send(n);
     }
     catch (e) {
