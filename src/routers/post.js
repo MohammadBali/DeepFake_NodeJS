@@ -6,9 +6,9 @@ const router= express.Router();
 //Add Post
 router.post('/addPost',auth.userAuth, async (req, res)=>{
 
-    const p= new Post(req.body);
-
     try{
+        const p= new Post(req.body);
+
         if(await Post.findOne({'inquiry':req.body.inquiry}) != null )
         {
             return res.status(400).send({'message':'The Same Inquiry has a Post'});
@@ -94,10 +94,10 @@ router.get('/likedPosts',auth.userAuth, async (req, res)=>{
 //Delete a Post
 router.delete('/deletePost/:id',auth.userAuth,async (req, res) =>
 {
-    console.log('In Deleting a Post');
-    const id= req.params.id ;
-
     try{
+        console.log('In Deleting a Post');
+        const id= req.params.id ;
+
         const p= await Post.findOneAndDelete({_id:id, owner:req.user._id});
         if(!p)
         {

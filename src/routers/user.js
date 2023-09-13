@@ -6,9 +6,10 @@ const router= express.Router();
 
 //Add a new User
 router.post('/addUser',async (req,res)=>{
-    const user= new User(req.body);
 
     try{
+        const user= new User(req.body);
+
         await user.save();
         const token=await user.generateAuthToken();
 
@@ -40,9 +41,9 @@ router.get('/users/me', auth.userAuth, async (req, res) => {
 
 //Get a Specific User with ID
 router.get('/users/:id',async (req, res) => {
-    const id = req.params.id;
 
     try {
+        const id = req.params.id;
         const u = await User.findById(id);
         if(!u)
         {
@@ -145,6 +146,34 @@ router.post('/users/logoutAll',auth.userAuth, async (req, res)=>{
         res.status(500).send(e);
     }
 
+});
+
+//Get a User Profile by his ID, for showing profile and posts.
+router.get('/users/getAUserProfile/:id', auth.userAuth, async (req,res)=>{
+
+    console.log('Getting a User Profile');
+
+    try
+    {
+        const id= req.params.id;
+
+        const u= await User.findOne({_id:id});
+
+        if(!u)
+        {
+            return res.status(404).send({'error':'No User has been found'});
+        }
+
+        await u.populate({
+            path:'posts',
+            options:{ sort:{createdAt:-1}, }, //Return Data with the last createdAt (newest first)
+        });
+
+        res.status(200).send({user:u, posts:u.posts});
+    }
+    catch (e) {
+        res.status(500).send({error:e, message:e.message});
+    }
 });
 
 

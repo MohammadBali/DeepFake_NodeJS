@@ -44,9 +44,9 @@ wsApp.ws('/webSocket',function (ws){ //was (ws,req).
     {
         try
         {
-            //const parsedMessage = JSON.parse(message);
+            const parsedMessage = JSON.parse(message);
             console.log(`Current message is ${message}`);
-            const parsedMessage=message;
+
             //Check if user is authenticated.
             if(await components.wsAuth(parsedMessage))
             {
@@ -91,22 +91,55 @@ wsApp.ws('/webSocket',function (ws){ //was (ws,req).
                     }
                 }
 
+
+
                 //Data Returned is -1 or -2 => No Post has been found and ONLY SEND IT TO THE CLIENT WHO SEND THE REQUEST => client===ws
                 else if (Number.isInteger(data)) {
-                    socketManager.clients.forEach(function (client) {
+                    let isFound=false;
+
+                    // socketManager.clients.forEach(function (client)
+                    // {
+                    //     if (client===ws && client.readyState === ws.OPEN) {
+                    //         client.send(JSON.stringify(data === -1 ? {error: 'Error ', message: 'No Such Post has been found'} : {error: 'Error ', message: 'Wrong Type'}));
+                    //         //break; //So Won't Loop for all other Clients
+                    //     }
+                    // });
+
+                    for(const client of socketManager.clients)
+                    {
+                        if(isFound)
+                        {
+                            break;
+                        }
+
                         if (client===ws && client.readyState === ws.OPEN) {
                             client.send(JSON.stringify(data === -1 ? {error: 'Error ', message: 'No Such Post has been found'} : {error: 'Error ', message: 'Wrong Type'}));
                         }
-                    });
+
+
+                    }
                 }
 
                 //Not Post or Number => Error and ONLY SEND IT TO THE CLIENT WHO SEND THE REQUEST => client===ws
                 else {
-                    socketManager.clients.forEach(function (client) {
+                    let isFound=false;
+                    // socketManager.clients.forEach(function (client) {
+                    //     if (client===ws && client.readyState === ws.OPEN) {
+                    //         client.send(JSON.stringify({error: 'Error While Processing data', message: data}));
+                    //     }
+                    // });
+                    //
+
+                    for(const client of socketManager.clients)
+                    {
+                        if(isFound)
+                        {
+                            break;
+                        }
                         if (client===ws && client.readyState === ws.OPEN) {
                             client.send(JSON.stringify({error: 'Error While Processing data', message: data}));
                         }
-                    });
+                    }
                 }
             }
 
@@ -119,6 +152,7 @@ wsApp.ws('/webSocket',function (ws){ //was (ws,req).
                 });
             }
         }
+
         catch (e) {
             console.error('WebSocket Error:', e);
 

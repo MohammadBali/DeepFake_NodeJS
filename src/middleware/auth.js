@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import {User} from "../models/user.js"
 import constants from "../shared/constants.js";
 import multer from "multer";
+
 const userAuth= async(req, res, next)=>{
     try{
         const token= req.header('Authorization').replace('Bearer ','');

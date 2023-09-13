@@ -119,8 +119,10 @@ router.get('/inquiries/me',auth.userAuth, async (req, res)=>{
 
 //Delete an Inquiry
 router.delete('inquiries/delete/:id',auth.userAuth,async (req, res)=>{
-    const id= req.params.id;
+
     try{
+        const id= req.params.id;
+
         const inquiry= await Inquiry.findOneAndDelete({_id:id, owner:req.user._id});
         if(!inquiry)
         {

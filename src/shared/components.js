@@ -49,7 +49,7 @@ async function AddLike({userID, postID})
 
         //If Like already exists =>  remove it.
         for (const e of p.likes) {
-            console.log(`in posts.likes, current like ID is ${e._id},`);
+            //console.log(`in posts.likes, current like ID is ${e._id},`);
             if(e.owner.toString() === userID)
             {
                 console.log('User has already liked this post, unliking it now...');

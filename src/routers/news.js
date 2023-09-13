@@ -8,7 +8,7 @@ router.get('/getNews', async(req,res)=>{
 
     try{
         const n= await News.find({},null,{sort: {publishedAt:-1}, limit:10 });
-        res.status(200).send(n);
+        res.status(200).send({articles:n});
     }
     catch (e) {
         console.log(`ERROR WHILE GETTING NEWS, ${e}`);
