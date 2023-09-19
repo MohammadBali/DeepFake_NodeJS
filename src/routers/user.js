@@ -13,12 +13,12 @@ router.post('/addUser',async (req,res)=>{
         await user.save();
         const token=await user.generateAuthToken();
 
-        res.status(201).send({user, token});
+        res.status(201).send({user, token, success:1});
     }
 
     catch (e) {
         console.log(`Error While Adding a user, ${e}`);
-        res.status(400).send(e);
+        res.status(400).send({error:"Couldn't Sign you", message:e , success:0});
     }
 });
 
@@ -112,9 +112,9 @@ router.post('/users/login', async (req,res)=>{
 
         const token= await user.generateAuthToken();
 
-        res.send({user,token});
+        res.send({user,token, success:1});
     }catch (e) {
-        res.status(400).send({'error':'Couldn\'t Login', 'message':e.toString()});
+        res.status(400).send({'error':'Couldn\'t Login', 'message':e.toString(), success:0});
     }
 });
 

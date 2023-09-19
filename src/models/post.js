@@ -2,6 +2,13 @@ import mongoose from "mongoose";
 import {Inquiry} from "./inquiry.js";
 
 const postSchema= new mongoose.Schema({
+
+    title:{
+        type:String,
+        required:true,
+        trim:true
+    },
+
     inquiry:{
         type: mongoose.Types.ObjectId,
         required:true,

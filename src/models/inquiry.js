@@ -46,6 +46,10 @@ const inquirySchema= new mongoose.Schema({
 },{timestamps:true});
 
 
+// inquirySchema.virtual('',{
+//
+// });
+
 //Delete Posts of this Inquiry when the inquiry gets deleted.
 inquirySchema.pre('findOneAndDelete', async function(next)
 {

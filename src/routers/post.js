@@ -32,13 +32,15 @@ router.get('/posts',auth.userAuth, async (req, res)=>{
     try
     {
         const page = parseInt(req.query.page) || 1; // Current page number, default to 1
-        const limit = parseInt(req.query.limit) || 10; // Number of posts per page, default to 10
+        const limit = parseInt(req.query.limit) || 3; // Number of posts per page, default to 10
 
         // Calculate the skip value
         const skip = (page - 1) * limit;
 
         //Criteria, Projection is Null , Options
-        const posts=await Post.find({},null,{limit:limit, skip:skip, sort:{createdAt:-1} });
+        const posts=await Post.find({},null,{limit:limit, skip:skip, sort:{createdAt:-1} }).populate(
+            {path:'inquiry', populate:{path:'owner',model:'User'} }).populate(
+                {path:'comments', populate:{path:'owner', model:'User', select:{'_id':1, 'name':1, 'photo':1} }});  //{path:'inquiry', populate:{path:'owner',model:'User'} } If to return user Data
 
         //Calculate the pagination and return it in a Map.
         const pagination= await Post.paginationCalculator(page,limit);
