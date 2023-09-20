@@ -11,7 +11,7 @@ router.post('/addPost',auth.userAuth, async (req, res)=>{
 
         if(await Post.findOne({'inquiry':req.body.inquiry}) != null )
         {
-            return res.status(400).send({'message':'The Same Inquiry has a Post'});
+            return res.status(400).send({'message':'The Same Inquiry has a Post', 'success':0});
         }
 
         await p.save();
@@ -20,13 +20,13 @@ router.post('/addPost',auth.userAuth, async (req, res)=>{
     }
     catch (e) {
         console.log(`ERROR WHILE ADDING NEW POST, ${e}`);
-        res.status(500).send(e);
+        res.status(500).send({'error':e, 'success':0});
     }
 });
 
 
-//Get All Available Posts
-router.get('/posts',auth.userAuth, async (req, res)=>{
+//Get All Available Posts, previously used auth.userAuth
+router.get('/posts', auth.userAuth, async (req, res)=>{
     console.log('Getting ALl Posts...');
 
     try
@@ -39,7 +39,7 @@ router.get('/posts',auth.userAuth, async (req, res)=>{
 
         //Criteria, Projection is Null , Options
         const posts=await Post.find({},null,{limit:limit, skip:skip, sort:{createdAt:-1} }).populate(
-            {path:'inquiry', populate:{path:'owner',model:'User'} }).populate(
+            {path:'owner',model:'User'} ).populate({path:'inquiry'}).populate(
                 {path:'comments', populate:{path:'owner', model:'User', select:{'_id':1, 'name':1, 'photo':1} }});  //{path:'inquiry', populate:{path:'owner',model:'User'} } If to return user Data
 
         //Calculate the pagination and return it in a Map.
@@ -60,7 +60,15 @@ router.get('/posts/me', auth.userAuth, async(req, res)=>{
     {
         await req.user.populate({
             path:'posts',
-            sort:{createdAt:-1}, //Return Data with the last createdAt (newest first)
+            populate:
+            [
+                {path:'inquiry', model:'Inquiry', populate:{path:'owner',model:'User'}},
+                {path:'comments',  populate:{path:'owner', model:'User', select:{'_id':1, 'name':1, 'photo':1} }},
+            ],
+
+            options:{
+                sort:{createdAt:-1}, //Return Data with the last createdAt (newest first)
+            }
         });
 
         res.status(200).send({posts:req.user.posts});

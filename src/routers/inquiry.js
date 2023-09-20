@@ -105,7 +105,10 @@ router.get('/inquiries/me',auth.userAuth, async (req, res)=>{
     try{
         await req.user.populate({
             path:'inquiries',
-            sort:{createdAt:-1}, //Return Data with the last createdAt (newest first)
+            options:{
+                sort:{createdAt:-1}, //Return Data with the last createdAt (newest first)
+            },
+
         });
 
         res.status(200).send({inquiries:req.user.inquiries});
@@ -118,11 +121,12 @@ router.get('/inquiries/me',auth.userAuth, async (req, res)=>{
 
 
 //Delete an Inquiry
-router.delete('inquiries/delete/:id',auth.userAuth,async (req, res)=>{
+router.delete('/inquiries/delete/:id',auth.userAuth,async (req, res)=>{
 
+    let gid;
     try{
         const id= req.params.id;
-
+        gid=id;
         const inquiry= await Inquiry.findOneAndDelete({_id:id, owner:req.user._id});
         if(!inquiry)
         {
@@ -132,7 +136,7 @@ router.delete('inquiries/delete/:id',auth.userAuth,async (req, res)=>{
         res.send(inquiry);
     }
     catch (e) {
-        console.log(`Could not delete the inquiry with ID: ${id}, ERROR : ${e}`);
+        console.log(`Could not delete the inquiry with ID: ${gid}, ERROR : ${e}`);
         res.status(500).send(e);
     }
 });
