@@ -19,6 +19,13 @@ const userSchema= new mongoose.Schema({
         trim:true
     },
 
+    last_name:{
+        type:String,
+        cast:false,
+        required:true,
+        trim:true
+    },
+
     gender:{
         type:String,
         cast:false,
@@ -90,7 +97,7 @@ const userSchema= new mongoose.Schema({
         required:false,
         cast:false,
         trim:true,
-        default:'avatar1.jpg',
+        default:'robot_2.jpg',
     },
 
     // isVerified:{

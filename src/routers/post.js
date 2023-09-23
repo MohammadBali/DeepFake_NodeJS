@@ -40,7 +40,7 @@ router.get('/posts', auth.userAuth, async (req, res)=>{
         //Criteria, Projection is Null , Options
         const posts=await Post.find({},null,{limit:limit, skip:skip, sort:{createdAt:-1} }).populate(
             {path:'owner',model:'User'} ).populate({path:'inquiry'}).populate(
-                {path:'comments', populate:{path:'owner', model:'User', select:{'_id':1, 'name':1, 'photo':1} }});  //{path:'inquiry', populate:{path:'owner',model:'User'} } If to return user Data
+                {path:'comments', populate:{path:'owner', model:'User', select:{'_id':1, 'name':1, 'photo':1, 'last_name':1} }});  //{path:'inquiry', populate:{path:'owner',model:'User'} } If to return user Data
 
         //Calculate the pagination and return it in a Map.
         const pagination= await Post.paginationCalculator(page,limit);
@@ -63,7 +63,7 @@ router.get('/posts/me', auth.userAuth, async(req, res)=>{
             populate:
             [
                 {path:'inquiry', model:'Inquiry', populate:{path:'owner',model:'User'}},
-                {path:'comments',  populate:{path:'owner', model:'User', select:{'_id':1, 'name':1, 'photo':1} }},
+                {path:'comments',  populate:{path:'owner', model:'User', select:{'_id':1, 'name':1, 'photo':1, 'last_name':1} }},
             ],
 
             options:{

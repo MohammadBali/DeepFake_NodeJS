@@ -65,9 +65,9 @@ const textAuth= multer({
 
     fileFilter(req,file,cb)
     {
-        if(!file.originalname.match(/\.(txt|doc|docx)$/))
+        if(!file.originalname.match(/\.(txt|doc|docx|pdf)$/))
         {
-            return cb(new Error('Text Type is incorrect'));
+            return cb(new Error('Text Type is incorrect, in txtAuth'));
         }
         cb(undefined,true);
     },

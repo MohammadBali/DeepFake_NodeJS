@@ -33,17 +33,21 @@ const postSchema= new mongoose.Schema({
 
     comments:[
         {
-            comment:{
-                type:String,
-                cast:true, //Maybe For Audios and Images ???
-                required:true,
-            },
+            type:new mongoose.Schema(
+        {
+                    comment:{
+                        type:String,
+                        cast:true, //Maybe For Audios and Images ???
+                        required:true,
+                    },
 
-            owner:{
-                type:mongoose.Types.ObjectId,
-                required:true,
-                ref:'User',
-            },
+                    owner:{
+                        type:mongoose.Types.ObjectId,
+                        required:true,
+                        ref:'User',
+                    },
+                },{timestamps:true},
+            ),
         }
     ],
 }, {timestamps:true,});
@@ -76,3 +80,27 @@ postSchema.statics.paginationCalculator= async function (page,limit)
     return pagination;
 }
 export const Post= mongoose.model('Post',postSchema);
+
+
+
+//OLD
+
+/*
+    comments:[
+        {
+            comment:{
+                type:String,
+                cast:true, //Maybe For Audios and Images ???
+                required:true,
+            },
+
+            owner:{
+                type:mongoose.Types.ObjectId,
+                required:true,
+                ref:'User',
+            },
+
+        }
+    ],
+
+ */

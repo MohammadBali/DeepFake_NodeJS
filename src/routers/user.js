@@ -58,7 +58,7 @@ router.get('/users/:id',async (req, res) => {
 //Update a User
 router.patch('/users/me', auth.userAuth, async (req, res) => {
     const updates= Object.keys(req.body);
-    const allowedUpdates=['name','password','email', 'photo'];
+    const allowedUpdates=['name','last_name','password','email', 'photo'];
 
     const isValid= updates.every((update)=>allowedUpdates.includes(update));
 
@@ -166,10 +166,15 @@ router.get('/users/getAUserProfile/:id', auth.userAuth, async (req,res)=>{
 
         await u.populate({
             path:'posts',
+            populate:
+                [
+                    {path:'inquiry'},
+                    {path:'comments', populate:{path:'owner', model:'User', select:{'_id':1, 'name':1, 'photo':1, 'last_name':1} } }
+                ],
             options:{ sort:{createdAt:-1}, }, //Return Data with the last createdAt (newest first)
         });
 
-        res.status(200).send({user:u, posts:u.posts});
+        res.status(200).send({owner:u, posts:u.posts});
     }
     catch (e) {
         res.status(500).send({error:e, message:e.message});
