@@ -1,6 +1,7 @@
 import express from "express";
 import auth from "../middleware/auth.js";
 import {Post} from "../models/post.js";
+import {User} from "../models/user.js";
 
 const router= express.Router();
 //Add Post
@@ -155,4 +156,28 @@ router.post('/AddLike',auth.userAuth, async(req, res)=>{
         res.status(500).send(e);
     }
 });
+
+
+router.get('/getSubscriptionsPosts', auth.userAuth, async(req,res)=>
+{
+    const limit=10;
+    try
+    {
+        const userIds= req.user.subscriptions.map(sub=>sub.owner_id);
+
+        const p= await Post.find({
+            owner:{$in:userIds},}, null, {limit:limit, sort:{createdAt:-1}}
+        ).populate('owner').populate('inquiry').populate(
+            {path:'comments',  populate:{path:'owner', model:'User', select:{'_id':1, 'name':1, 'photo':1, 'last_name':1} }},
+        );
+
+        res.status(200).send({posts:p});
+    }
+    catch (e) {
+        console.log(`ERROR WHILE GETTING SUBSCRIPTIONS, ${e.toString()}`);
+        res.status(500).send(e);
+    }
+});
+
+
 export default router;

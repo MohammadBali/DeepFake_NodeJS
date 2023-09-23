@@ -100,6 +100,16 @@ const userSchema= new mongoose.Schema({
         default:'robot_2.jpg',
     },
 
+    subscriptions:[
+        {
+            owner_id:{
+                type:mongoose.Schema.Types.ObjectId,
+                required:true,
+                ref:'User',
+            },
+        }
+    ],
+
     // isVerified:{
     //     type:Boolean,
     //     required:false,
@@ -131,6 +141,12 @@ userSchema.virtual('posts',{
     foreignField:'owner',
 });
 
+
+userSchema.virtual('subscribedUsers',{
+    ref:'User',
+    localField:'_id',
+    foreignField:'subscriptions.owner_id',
+});
 
 
 //Hashing Password before Saving

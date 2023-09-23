@@ -40,7 +40,9 @@ async function AddLike({userID, postID})
 
     try
     {
-        const p = await Post.findOne({_id:postID});
+        const p = await Post.findOne({_id:postID}).populate('owner').populate('inquiry').populate(
+            {path:'comments',  populate:{path:'owner', model:'User', select:{'_id':1, 'name':1, 'photo':1, 'last_name':1} }},
+        );
         if (!p)
         {
             console.log('No Post has been found');
@@ -55,6 +57,8 @@ async function AddLike({userID, postID})
                 console.log('User has already liked this post, unliking it now...');
                 p.likes.splice(p.likes.indexOf(e));
                 await p.save();
+
+
                 return p;
             }
         }
@@ -62,6 +66,7 @@ async function AddLike({userID, postID})
         //Like doesn't already exist => Add it and save then pass the Post p
         p.likes=p.likes.concat({owner:userID});
         await p.save();
+
         return p;
     }
 
@@ -86,7 +91,11 @@ async function AddComment({userID, postID, comment})
 
         p.comments=p.comments.concat({comment, owner:userID});
         await p.save();
-        return p;
+
+        const pp = await Post.findOne({_id:postID}).populate('owner').populate('inquiry').populate(
+            {path:'comments',  populate:{path:'owner', model:'User', select:{'_id':1, 'name':1, 'photo':1, 'last_name':1} }},
+        );
+        return pp;
     }
     catch (e) {
         console.log(`ERROR WHILE ADDING A COMMENT, ${e}`);
@@ -101,7 +110,9 @@ async function deleteComment({commentID, postID})
 
     try
     {
-        const p= await Post.findOne({_id:postID});
+        const p= await Post.findOne({_id:postID}).populate('owner').populate('inquiry').populate(
+            {path:'comments',  populate:{path:'owner', model:'User', select:{'_id':1, 'name':1, 'photo':1, 'last_name':1} }},
+        );
 
         if(!p)
         {

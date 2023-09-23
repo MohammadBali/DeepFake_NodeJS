@@ -182,4 +182,67 @@ router.get('/users/getAUserProfile/:id', auth.userAuth, async (req,res)=>{
 });
 
 
+router.post('/manageSubscription/:id', auth.userAuth, async (req, res)=>{
+    console.log('In Adding a Subscription');
+
+    try
+    {
+        const uId=req.params.id;
+
+        const subUser= await User.findOne({_id:uId});
+
+        if(!subUser)
+        {
+            return res.status(404).send({'error':'No Such User has been found'});
+        }
+
+        else
+        {
+            if(req.user.subscriptions.some(sub=>sub.owner_id.toString() === uId) )
+            {
+                req.user.subscriptions = req.user.subscriptions.filter((sub)=>
+                {
+                    return sub.owner_id.toString() !== uId;
+                }); //Removing the subscribed user id.
+
+                await req.user.save();
+
+                return res.status(201).send({user:req.user, status:'removed user ${uId}', removed_user_id:uId});
+            }
+            else
+            {
+                req.user.subscriptions= req.user.subscriptions.concat({'owner_id':uId});
+
+                await req.user.save();
+
+                return res.status(201).send({user:req.user, status:`added user ${uId}`, added_user_id:uId} );
+            }
+
+
+        }
+    }
+    catch (e) {
+        console.log(`ERROR WHILE ADDING A SUBSCRIPTIONS, ${e.toString()}`);
+        res.status(500).send(e);
+    }
+});
+
+
+router.get('/getSubscriptions', auth.userAuth, async(req,res)=>{
+    console.log('In Getting Subscriptions');
+    try
+    {
+        await req.user.populate('subscribedUsers');
+
+        res.status(201).send({subscriptions:req.user.subscriptions});
+    }
+    catch (e) {
+        console.log(`ERROR WHILE GETTING SUBSCRIPTIONS, ${e.toString()}`);
+        res.status(500).send(e);
+    }
+
+});
+
+
+
 export default router

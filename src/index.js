@@ -60,7 +60,7 @@ wsApp.ws('/webSocket',function (ws){ //was (ws,req).
                     if (parsedMessage.type === 'comment') {
                         socketManager.clients.forEach(function (client) {
                             if (client.readyState === ws.OPEN) {
-                                client.send(JSON.stringify({data:data, type:'Add_Comment'})); // we can write {type:'comment', data:data} then stringify it ??
+                                client.send(JSON.stringify({posts:data, type:'add_comment'})); // we can write {type:'comment', data:data} then stringify it ??
                             }
                         });
                     }
@@ -68,7 +68,7 @@ wsApp.ws('/webSocket',function (ws){ //was (ws,req).
                     if (parsedMessage.type === 'like') {
                         socketManager.clients.forEach(function (client) {
                             if (client.readyState === ws.OPEN) {
-                                client.send(JSON.stringify({data:data, type:'Like'}));
+                                client.send(JSON.stringify({posts:data, type:'like'}));
                             }
                         });
                     }
@@ -76,7 +76,7 @@ wsApp.ws('/webSocket',function (ws){ //was (ws,req).
                     if (parsedMessage.type === 'deleteComment') {
                         socketManager.clients.forEach(function (client) {
                             if (client.readyState === ws.OPEN) {
-                                client.send(JSON.stringify({data:data, type:'Delete_Comment'}));
+                                client.send(JSON.stringify({posts:data, type:'delete_comment'}));
                             }
                         });
                     }
@@ -85,7 +85,7 @@ wsApp.ws('/webSocket',function (ws){ //was (ws,req).
                     if (parsedMessage.type === 'deletePost') {
                         socketManager.clients.forEach(function (client) {
                             if (client.readyState === ws.OPEN) {
-                                client.send(JSON.stringify({data:data, type:'Delete_Post'}));
+                                client.send(JSON.stringify({posts:data, type:'delete_post'}));
                             }
                         });
                     }
