@@ -36,38 +36,52 @@ async function analyseMessageType(message)
 //Add a Like to a Post
 async function AddLike({userID, postID})
 {
-    console.log(`Adding a Like to a Post in Components, userID is:${userID}, postID is: ${postID}`);
+    console.log(`Modifying a Like to a Post in Components, userID is:${userID}, postID is: ${postID}`);
 
-    try
-    {
-        const p = await Post.findOne({_id:postID}).populate('owner').populate('inquiry').populate(
-            {path:'comments',  populate:{path:'owner', model:'User', select:{'_id':1, 'name':1, 'photo':1, 'last_name':1} }},
+    try {
+        const p = await Post.findOne({_id: postID}).populate('owner').populate('inquiry').populate(
+            {
+                path: 'comments',
+                populate: {path: 'owner', model: 'User', select: {'_id': 1, 'name': 1, 'photo': 1, 'last_name': 1}}
+            },
         );
-        if (!p)
-        {
+        if (!p) {
             console.log('No Post has been found');
             return -1;
         }
 
+        let elementIndex = -1;
+
         //If Like already exists =>  remove it.
         for (const e of p.likes) {
             //console.log(`in posts.likes, current like ID is ${e._id},`);
-            if(e.owner.toString() === userID)
-            {
-                console.log('User has already liked this post, unliking it now...');
-                p.likes.splice(p.likes.indexOf(e));
-                await p.save();
-
-
-                return p;
+            if (e.owner.toString() === userID) {
+                elementIndex=p.likes.indexOf(e);
+                break;
+                // p.likes.splice(p.likes.indexOf(e));
+                // await p.save();
+                // return p;
             }
         }
 
-        //Like doesn't already exist => Add it and save then pass the Post p
-        p.likes=p.likes.concat({owner:userID});
-        await p.save();
+        //User Has Liked that post => Remove it and return posts.
+        if (elementIndex !== -1)
+        {
+            console.log('User has already liked this post, unliking it now...');
+            p.likes.splice(p.likes[elementIndex],1);
+            await p.save();
 
-        return p;
+            return p;
+        }
+
+        else
+        {
+            //Like doesn't already exist => Add it and save then pass the Post p
+            p.likes=p.likes.concat({owner:userID});
+            await p.save();
+
+            return p;
+        }
     }
 
     catch (e) {
@@ -92,10 +106,12 @@ async function AddComment({userID, postID, comment})
         p.comments=p.comments.concat({comment, owner:userID});
         await p.save();
 
-        const pp = await Post.findOne({_id:postID}).populate('owner').populate('inquiry').populate(
-            {path:'comments',  populate:{path:'owner', model:'User', select:{'_id':1, 'name':1, 'photo':1, 'last_name':1} }},
+        return await Post.findOne({_id: postID}).populate('owner').populate('inquiry').populate(
+            {
+                path: 'comments',
+                populate: {path: 'owner', model: 'User', select: {'_id': 1, 'name': 1, 'photo': 1, 'last_name': 1}}
+            },
         );
-        return pp;
     }
     catch (e) {
         console.log(`ERROR WHILE ADDING A COMMENT, ${e}`);
@@ -119,14 +135,24 @@ async function deleteComment({commentID, postID})
             console.log("No Such Post found with this commentID");
             return -1;
         }
+
+        let elementIndex=-1;
+
         for(const e of p.comments)
         {
             if(e._id.toString() === commentID)
             {
-                p.comments.splice(p.comments.indexOf(e)); //Remove the Comment
-                await p.save();
-                return p;
+                console.log(`COMMENT ID: ${e._id}`);
+                elementIndex=p.comments.indexOf(e);
+                break;
             }
+        }
+
+        if(elementIndex !== -1)
+        {
+            p.comments.splice(p.comments[elementIndex],1); //Remove the Comment
+            await p.save();
+            return p;
         }
         return -1;
     }
@@ -141,7 +167,12 @@ async function deletePost({postID, userID})
 {
 
     try{
-        const p= await Post.findOneAndDelete({_id:postID, owner:userID});
+        const p= await Post.findOneAndDelete({_id:postID, owner:userID}).populate('owner').populate('inquiry').populate(
+            {
+                path: 'comments',
+                populate: {path: 'owner', model: 'User', select: {'_id': 1, 'name': 1, 'photo': 1, 'last_name': 1}}
+            },
+        );
         if(!p)
         {
             return -1;
