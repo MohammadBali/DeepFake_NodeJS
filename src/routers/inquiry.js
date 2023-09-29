@@ -7,6 +7,7 @@ const router= express.Router();
 //Add a Text Inquiry, expecting an image which keyword name is 'text'
 router.post('/addTextInquiry',auth.userAuth, auth.textAuth.single('text'),async (req, res)=>{
 
+    console.log('Getting Text Data');
 
     try{
         const textBuffer= req.file.buffer;
@@ -18,10 +19,22 @@ router.post('/addTextInquiry',auth.userAuth, auth.textAuth.single('text'),async 
             owner:req.user._id,
             result:req.body.result,
         });
-
         await inquiry.save();
 
-        res.status(201).send({inquiry});
+
+        res.status(201).send({
+            inquiry:
+                {
+                    name:inquiry.name,
+                    type:inquiry.type,
+                    owner:inquiry.owner,
+                    _id:inquiry._id,
+                    result:inquiry.result,
+                    createdAt:inquiry.createdAt,
+                    updatedAt:inquiry.updatedAt,
+                    data:inquiry.data,
+                },
+        });
     }
     catch (e) {
         console.log(`Could not Add Inquiry, ${e}`);

@@ -17,7 +17,7 @@ const userAuth= async(req, res, next)=>{
         }
         req.token=token; //Add the token for logout session
         req.user=user;
-        console.log(`${user._id} is Authenticated `);
+        //console.log(`${user._id} is Authenticated `);
         next();
     }catch (e) {
         res.status(401).send({error:'Not Authenticated', e});
@@ -60,7 +60,7 @@ const audioAuth= multer({
 
 const textAuth= multer({
     limits:{
-        fileSize: 12000000, //12MB
+        fileSize: 15000000, //12MB
     },
 
     fileFilter(req,file,cb)
