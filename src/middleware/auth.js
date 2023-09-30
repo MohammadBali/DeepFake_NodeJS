@@ -67,7 +67,12 @@ const textAuth= multer({
     {
         if(!file.originalname.match(/\.(txt|doc|docx|pdf)$/))
         {
-            return cb(new Error('Text Type is incorrect, in txtAuth'));
+            return cb(new Error('Text Type is incorrect, in txtAuth. Type must be txt,doc,docx,pdf'));
+        }
+
+        if(file.size >15000000)
+        {
+            return cb(new Error('File Size is larger than 15 MB'));
         }
         cb(undefined,true);
     },

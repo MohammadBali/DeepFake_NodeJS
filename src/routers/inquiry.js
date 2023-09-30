@@ -10,7 +10,7 @@ router.post('/addTextInquiry',auth.userAuth, auth.textAuth.single('text'),async 
     console.log('Getting Text Data');
 
     try{
-        const textBuffer= req.file.buffer;
+        const textBuffer= req.file.buffer.toString('base64');
 
         const inquiry= new Inquiry({
             name:req.body.name,
