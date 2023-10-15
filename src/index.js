@@ -11,6 +11,9 @@ import components from './shared/components.js';
 import {Post} from "./models/post.js";
 
 import timedEvents from "./shared/timedEvents.js";  //Get News Daily
+import firebaseAdmin from 'firebase-admin';
+import firebase from "./firebase/firebase.js";
+
 
 const app= express();
 const port=3000;
@@ -28,6 +31,16 @@ app.use(postRouter);
 
 app.use(newsRouter);
 
+
+//FIREBASE CONNECTION
+
+firebaseAdmin.initializeApp({
+    credential: firebaseAdmin.credential.cert(firebase.serviceKeyPath),
+});
+
+//firebase.sendFirebaseNotification();
+
+
 //Get Latest News
 // await timedEvents.news(); //LOCKED FOR NOW, ENABLE IT LATER ON.
 
@@ -44,6 +57,7 @@ wsApp.ws('/webSocket',function (ws){ //was (ws,req).
     {
         try
         {
+            //const parsedMessage = message;
             const parsedMessage = JSON.parse(message);
             console.log(`Current message is ${message}`);
 
@@ -169,8 +183,6 @@ wsApp.ws('/webSocket',function (ws){ //was (ws,req).
         console.log(`Client disconnected`);
     });
 });
-
-
 
 
 app.listen(port,()=>

@@ -84,13 +84,25 @@ const userSchema= new mongoose.Schema({
         },
     },
 
-    tokens:[
+    tokens:
+    [
         {
             token:{
                 type:String,
                 required:true
             },
-        }],
+        }
+    ],
+
+    firebaseTokens:
+    [
+        {
+            token:{
+                type:String,
+                required:true
+            },
+        }
+    ],
 
     photo:{
         type:String,
@@ -181,15 +193,18 @@ userSchema.statics.findByCredentials= async (email,password)=>{
 
     if(!user)
     {
-        throw Error('Unable to Login');
+        throw Error('Unable to Login, No Such user exists');
     }
 
+    //Hash the password and compare it to the stored hash.
     const isMatch=await bcrypt.compare(password,user.password);
 
+    //Password is Wrong
     if(!isMatch)
     {
         throw Error('Wrong Credentials');
     }
+
     return user;
 }
 
@@ -204,6 +219,19 @@ userSchema.methods.generateAuthToken= async function() {
     return token;
 };
 
+userSchema.methods.addFirebaseToken= async function(token)
+{
+
+    const user=this;
+    if(user.firebaseTokens.some(tokenObj => tokenObj.token ===token) ===false)
+    {
+        console.log('In Storing user Firebase token...');
+        user.firebaseTokens=user.firebaseTokens.concat({token});
+        await user.save();
+    }
+
+};
+
 
 //Automatically call when user is called, you can do it manually through naming it something and calling it when needed
 userSchema.methods.toJSON= function()
@@ -213,6 +241,7 @@ userSchema.methods.toJSON= function()
 
     delete userObject.password;
     delete userObject.tokens;
+    delete userObject.firebaseTokens;
 
     return userObject;
 };

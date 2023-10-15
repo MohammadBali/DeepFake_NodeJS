@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import {Inquiry} from "./inquiry.js";
+import firebase from "../firebase/firebase.js";
 
 const postSchema= new mongoose.Schema({
 
@@ -52,7 +53,27 @@ const postSchema= new mongoose.Schema({
     ],
 }, {timestamps:true,});
 
-
+//Needs fixes
+// postSchema.pre('save',async function (next) {
+//     const post=this;
+//     if(post.isModified('likes'))
+//     {
+//         //Reached Multiply of 10 => send firebase Message
+//         if(true) //post.likes.length % 10 ===0
+//         {
+//             await post.populate('owner');
+//             const message=firebase.setFirebaseNotificationMessage(
+//                 post.owner.firebaseTokens,
+//                 `Your Post Got ${post.likes.length} Likes!`,
+//                 'Check your post now!',
+//                 {},
+//
+//             );
+//             console.log(post.owner);
+//             firebase.sendFirebaseNotification();
+//         }
+//     }
+// });
 
 //Calculate the Pagination and return the data
 postSchema.statics.paginationCalculator= async function (page,limit)
@@ -79,28 +100,27 @@ postSchema.statics.paginationCalculator= async function (page,limit)
 
     return pagination;
 }
+
 export const Post= mongoose.model('Post',postSchema);
 
 
 
-//OLD
 
-/*
-    comments:[
-        {
-            comment:{
-                type:String,
-                cast:true, //Maybe For Audios and Images ???
-                required:true,
-            },
+// DOES NOT WORK BECAUSE DATABASE IS NOT CLUSTERED...
 
-            owner:{
-                type:mongoose.Types.ObjectId,
-                required:true,
-                ref:'User',
-            },
 
-        }
-    ],
-
- */
+// //Listen to changes on Posts, if any change occurs on the likes => will send firebase message
+// const postChangeStream = Post.watch();
+// postChangeStream.on('change',async (event)=>
+// {
+//     console.log('CHANGE IN LIKES');
+//     if(event.updateDescription.updatedFields.likes && event.updateDescription.updatedFields)
+//     {
+//         console.log('CHANGE IN LIKES');
+//         const p=await Post.findById(event.documentKey._id);
+//
+//         console.log(`Post ID: ${p._id}, Owner ID:${p.owner}`);
+//     }
+// });
+//
+//

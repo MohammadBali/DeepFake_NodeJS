@@ -10,10 +10,22 @@ router.post('/addUser',async (req,res)=>{
     try{
         const user= new User(req.body);
 
-        await user.save();
-        const token=await user.generateAuthToken();
+        if(req.body.firebaseToken !=null)
+        {
+            await user.addFirebaseToken(req.body.firebaseToken); //Adding firebase token
 
-        res.status(201).send({user, token, success:1});
+            const token=await user.generateAuthToken();
+
+            res.status(201).send({user, token, success:1});
+        }
+
+        else
+        {
+            await user.save();
+            const token=await user.generateAuthToken();
+
+            res.status(201).send({user, token, success:1});
+        }
     }
 
     catch (e) {
@@ -112,6 +124,11 @@ router.post('/users/login', async (req,res)=>{
 
         const token= await user.generateAuthToken();
 
+        if(req.body.firebaseToken !=null)
+        {
+            await user.addFirebaseToken(req.body.firebaseToken);
+        }
+
         res.send({user,token, success:1});
     }catch (e) {
         res.status(400).send({'error':'Couldn\'t Login', 'message':e.toString(), success:0});
@@ -125,6 +142,10 @@ router.post('/users/logout',auth.userAuth, async(req, res)=>{
         req.user.tokens = req.user.tokens.filter((token)=>{
             return token.token !== req.token;
         }); //Removing the token that the user provided from the token lists.
+
+        req.user.firebaseTokens = req.user.firebaseTokens.filter((token)=>{
+            return token.token !== req.body.firebaseToken;
+        }); //Removing the firebaseToken of the logged out device.
 
         await req.user.save(); //Saving that user
 
