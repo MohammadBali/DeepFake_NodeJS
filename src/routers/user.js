@@ -143,10 +143,7 @@ router.post('/users/logout',auth.userAuth, async(req, res)=>{
             return token.token !== req.token;
         }); //Removing the token that the user provided from the token lists.
 
-        req.user.firebaseTokens = req.user.firebaseTokens.filter((token)=>{
-            return token.token !== req.body.firebaseToken;
-        }); //Removing the firebaseToken of the logged out device.
-
+        req.user.firebaseTokens=''; //Removing the firebaseToken of the logged out device.
         await req.user.save(); //Saving that user
 
         res.status(200).send({'message':'Logged out successfully'});

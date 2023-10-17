@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import {Inquiry} from "./inquiry.js";
 import firebase from "../firebase/firebase.js";
+import {User} from "./user.js";
 
 const postSchema= new mongoose.Schema({
 
@@ -47,33 +48,64 @@ const postSchema= new mongoose.Schema({
                         required:true,
                         ref:'User',
                     },
-                },{timestamps:true},
+                },{timestamps:true,},
             ),
         }
     ],
 }, {timestamps:true,});
 
 //Needs fixes
-// postSchema.pre('save',async function (next) {
-//     const post=this;
-//     if(post.isModified('likes'))
-//     {
-//         //Reached Multiply of 10 => send firebase Message
-//         if(true) //post.likes.length % 10 ===0
-//         {
-//             await post.populate('owner');
-//             const message=firebase.setFirebaseNotificationMessage(
-//                 post.owner.firebaseTokens,
-//                 `Your Post Got ${post.likes.length} Likes!`,
-//                 'Check your post now!',
-//                 {},
-//
-//             );
-//             console.log(post.owner);
-//             firebase.sendFirebaseNotification();
-//         }
-//     }
-// });
+postSchema.pre('save',async function (next) {
+    const post=this;
+    if(post.isModified('likes'))
+    {
+        //Reached Multiply of 10 => send firebase Message
+        if(post.likes.length % 10 ===0 && post.likes.length !==0) //post.likes.length % 10 ===0
+        {
+            try
+            {
+                await post.populate('owner');
+                const message=firebase.setFirebaseNotificationMessage(
+                    post.owner.firebaseTokens, //post.owner.firebaseTokens,
+                    `Your Post Got ${post.likes.length} Likes!`,
+                    'Check your post now!',
+                    {},
+
+                );
+                firebase.sendFirebaseNotification(message);
+            }
+            catch (e)
+            {
+                console.log(`ERROR WHILE SENDING FIREBASE MESSAGE IN POST-SCHEMA.PRE(SAVE), ${e}`);
+            }
+        }
+    }
+
+
+    if(post.isModified('comments'))
+    {
+        //Reached Multiply of 10 => send firebase Message
+        if(post.comments.length % 10 ===0 && post.comments.length !==0) //post.comments.length % 10 ===0
+        {
+            try
+            {
+                await post.populate('owner');
+                const message=firebase.setFirebaseNotificationMessage(
+                    post.owner.firebaseTokens, //post.owner.firebaseTokens,
+                    `Your Post Got ${post.comments.length} comments!`,
+                    'Check your post now!',
+                    {},
+
+                );
+                firebase.sendFirebaseNotification(message);
+            }
+            catch (e)
+            {
+                console.log(`ERROR WHILE SENDING FIREBASE MESSAGE IN POST-SCHEMA.PRE(SAVE), ${e}`);
+            }
+        }
+    }
+});
 
 //Calculate the Pagination and return the data
 postSchema.statics.paginationCalculator= async function (page,limit)

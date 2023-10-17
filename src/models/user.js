@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, {mongo} from "mongoose";
 import validator from "validator";
 
 import {Inquiry} from "./inquiry.js";
@@ -95,16 +95,13 @@ const userSchema= new mongoose.Schema({
     ],
 
     firebaseTokens:
-    [
-        {
-            token:{
-                type:String,
-                required:true
-            },
-        }
-    ],
+    {
+        type:String,
+        required:false,
+    },
 
-    photo:{
+    photo:
+    {
         type:String,
         required:false,
         cast:false,
@@ -221,14 +218,33 @@ userSchema.methods.generateAuthToken= async function() {
 
 userSchema.methods.addFirebaseToken= async function(token)
 {
-
-    const user=this;
-    if(user.firebaseTokens.some(tokenObj => tokenObj.token ===token) ===false)
+    try
     {
-        console.log('In Storing user Firebase token...');
-        user.firebaseTokens=user.firebaseTokens.concat({token});
-        await user.save();
+        const user=this;
+        if(user.firebaseTokens !== token)
+        {
+            console.log('In Storing user Firebase token...');
+            user.firebaseTokens=token;
+            await user.save();
+        }
+        else
+        {
+            console.log('Firebase token is the same as stored...');
+        }
     }
+    catch (e)
+    {
+        throw Error(`ERROR WHILE ADDING FIREBASE TOKEN, ${e}`);
+    }
+
+
+    //OLD Method for having multi tokens for firebase => now only one device will be saved
+    // if(user.firebaseTokens.some(tokenObj => tokenObj.token ===token) ===false)
+    // {
+    //     console.log('In Storing user Firebase token...');
+    //     user.firebaseTokens=user.firebaseTokens.concat({token});
+    //     await user.save();
+    // }
 
 };
 
