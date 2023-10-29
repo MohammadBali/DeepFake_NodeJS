@@ -54,7 +54,8 @@ const postSchema= new mongoose.Schema({
     ],
 }, {timestamps:true,});
 
-//Needs fixes
+
+//Send Notification to Post Owner when his post reaches multiples of 10 (Likes or Comments)
 postSchema.pre('save',async function (next) {
     const post=this;
     if(post.isModified('likes'))
@@ -73,14 +74,15 @@ postSchema.pre('save',async function (next) {
 
                 );
                 firebase.sendFirebaseNotification(message);
+                next();
             }
             catch (e)
             {
                 console.log(`ERROR WHILE SENDING FIREBASE MESSAGE IN POST-SCHEMA.PRE(SAVE), ${e}`);
+                next();
             }
         }
     }
-
 
     if(post.isModified('comments'))
     {
@@ -98,12 +100,70 @@ postSchema.pre('save',async function (next) {
 
                 );
                 firebase.sendFirebaseNotification(message);
+                next();
             }
             catch (e)
             {
                 console.log(`ERROR WHILE SENDING FIREBASE MESSAGE IN POST-SCHEMA.PRE(SAVE), ${e}`);
+                next();
             }
         }
+    }
+});
+
+
+//After saving the post, will check for all the users who are subscribed to this post owner and notify them about the new post
+postSchema.post('save', async function(doc,next){
+
+    //Check if the post is new
+    if(true) //doc.isNew
+    {
+        try
+        {
+            await doc.populate('owner');
+
+            const users= await User.find({'subscriptions.owner_id':doc.owner._id});
+
+            if(!users)
+            {
+                console.log(`No Users are subscribed to this user (${doc.owner._id}) content`);
+                next();
+            }
+
+            else
+            {
+                for (let user of users)
+                {
+                    if(user.firebaseTokens != null)
+                    {
+                        console.log(`FirebaseToken is ${user.firebaseTokens}`);
+                        const message=firebase.setFirebaseNotificationMessage(
+                            user.firebaseTokens,
+                            `${doc.owner.name} ${doc.owner.last_name} has shared a new post!`,
+                            `"${doc.title}", Check it now`,
+                            {
+                                'post_id':`${doc._id}`,
+                            },
+
+                        );
+                        firebase.sendFirebaseNotification(message);
+                    }
+                }
+
+                next();
+            }
+        }
+        catch (e) {
+            console.log(`ERROR WHILE POST_SAVE IN POST, ${e.toString()}`);
+            next();
+        }
+    }
+
+    else
+    {
+        console.log('NOT NEW');
+
+        next();
     }
 });
 
