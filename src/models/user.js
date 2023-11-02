@@ -119,6 +119,12 @@ const userSchema= new mongoose.Schema({
         }
     ],
 
+    isOfficial:{
+        type:Boolean,
+        default:false,
+        required:false,
+    },
+
     // isVerified:{
     //     type:Boolean,
     //     required:false,

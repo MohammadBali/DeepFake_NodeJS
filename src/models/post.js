@@ -196,8 +196,6 @@ postSchema.statics.paginationCalculator= async function (page,limit)
 export const Post= mongoose.model('Post',postSchema);
 
 
-
-
 // DOES NOT WORK BECAUSE DATABASE IS NOT CLUSTERED...
 
 

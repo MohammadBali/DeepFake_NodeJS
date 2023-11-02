@@ -36,6 +36,7 @@ router.post('/addTextInquiry',auth.userAuth, auth.textAuth.single('text'),async 
                 },
         });
     }
+
     catch (e) {
         console.log(`Could not Add Inquiry, ${e}`);
         res.status(500).send(e);
