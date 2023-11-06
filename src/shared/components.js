@@ -292,7 +292,6 @@ async function storeNews(result)
         }
 
     }
-
 }
 
 export default {analyseMessageType, wsAuth, getNews}

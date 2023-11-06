@@ -125,6 +125,7 @@ const userSchema= new mongoose.Schema({
         required:false,
     },
 
+    //For Account Activation via Email (Send OTP)
     // isVerified:{
     //     type:Boolean,
     //     required:false,

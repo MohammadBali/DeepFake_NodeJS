@@ -83,6 +83,18 @@ router.patch('/users/me', auth.userAuth, async (req, res) => {
         //This Method was used instead of findByIdAndUpdate, so it runs through the middleware. LOAD  USER by ID, then SET HIS DATA, then user.save()
 
         const user= req.user;
+
+        //Check for the provided email, if it exists then deny the user request
+        if(updates.includes('email'))
+        {
+            const e = await User.findOne({email:req.body['email']});
+
+            if(e)
+            {
+                return res.status(400).send({'error':'This email has been used before'});
+            }
+        }
+
         updates.forEach((update)=>
         {
             user[update]=req.body[update];
@@ -199,7 +211,7 @@ router.get('/users/getAUserProfile/:id', auth.userAuth, async (req,res)=>{
     }
 });
 
-
+//Add or Remove a subscription to a User
 router.post('/manageSubscription/:id', auth.userAuth, async (req, res)=>{
     console.log('In Adding a Subscription');
 
@@ -245,7 +257,7 @@ router.post('/manageSubscription/:id', auth.userAuth, async (req, res)=>{
     }
 });
 
-
+//Return the subscribed users
 router.get('/getSubscriptions', auth.userAuth, async(req,res)=>{
     console.log('In Getting Subscriptions');
     try
