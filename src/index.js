@@ -14,7 +14,6 @@ import timedEvents from "./shared/timedEvents.js";  //Get News Daily
 import firebaseAdmin from 'firebase-admin';
 import firebase from "./firebase/firebase.js";
 
-
 const app= express();
 const port=3000;
 

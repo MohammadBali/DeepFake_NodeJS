@@ -126,7 +126,7 @@ postSchema.post('save', async function(doc,next){
 
             if(!users)
             {
-                console.log(`No Users are subscribed to this user (${doc.owner._id}) content`);
+                //console.log(`No Users are subscribed to this user (${doc.owner._id}) content`);
                 next();
             }
 
@@ -136,14 +136,14 @@ postSchema.post('save', async function(doc,next){
                 {
                     if(user.firebaseTokens != null)
                     {
-                        console.log(`FirebaseToken is ${user.firebaseTokens}`);
+                        //console.log(`FirebaseToken is ${user.firebaseTokens}`);
                         const message=firebase.setFirebaseNotificationMessage(
                             user.firebaseTokens,
                             `${doc.owner.name} ${doc.owner.last_name} has shared a new post!`,
                             `"${doc.title}", Check it now`,
                             {
-                                'post_id':`${doc._id}`,
-                            },
+                                    'post_id':`${doc._id}`,
+                                 },
 
                         );
                         firebase.sendFirebaseNotification(message);

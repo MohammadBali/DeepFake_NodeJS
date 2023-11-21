@@ -194,7 +194,6 @@ userSchema.pre('findOneAndDelete', async function(next)
 userSchema.statics.findByCredentials= async (email,password)=>{
 
     const user= await User.findOne({email});
-
     if(!user)
     {
         throw Error('Unable to Login, No Such user exists');
@@ -223,11 +222,13 @@ userSchema.methods.generateAuthToken= async function() {
     return token;
 };
 
+//Add the Firebase Token into the user's data
 userSchema.methods.addFirebaseToken= async function(token)
 {
     try
     {
         const user=this;
+        //The current saved token is different from the passed one
         if(user.firebaseTokens !== token)
         {
             console.log('In Storing user Firebase token...');
