@@ -1,6 +1,7 @@
 import express from "express";
 import auth from "../middleware/auth.js";
 import {Inquiry} from "../models/inquiry.js";
+import components from "../shared/components.js";
 
 const router= express.Router();
 
@@ -9,18 +10,27 @@ router.post('/addTextInquiry',auth.userAuth, auth.textAuth.single('text'),async 
 
     console.log('Getting Text Data');
 
-    try{
+    try
+    {
         const textBuffer= req.file.buffer.toString('base64');
+
+        const modelResult = await components.sendInquiryToModel(req.file.buffer.toString()); //Send File to AI Model and get the results back
+
+        if(modelResult ==null)
+        {
+            console.log(`Model Result is empty, ${modelResult}`);
+
+            return res.status(400).send({error:'Model result was empty'});
+        }
 
         const inquiry= new Inquiry({
             name:req.body.name,
             type:req.body.type,
             data:textBuffer, //Data is String
             owner:req.user._id,
-            result:req.body.result,
+            result:modelResult['predicted_class'] === "machine generated" ? 'fake' : 'real', //Different word usage for storing if it's fake or not
         });
         await inquiry.save();
-
 
         res.status(201).send({
             inquiry:

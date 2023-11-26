@@ -294,4 +294,28 @@ async function storeNews(result)
     }
 }
 
-export default {analyseMessageType, wsAuth, getNews}
+//Send Inquiry to AI Model and get the result back
+async function sendInquiryToModel(data)
+{
+
+    try
+    {
+        //console.log(`Data to send: ${data}`);
+        const result = await axios.post(constants.modelURL, {'text':data});
+
+        if(result !==null)
+        {
+            console.log(`Got Model Result, ${result.data['predicted_class']}`);
+            return result.data;
+        }
+        return null;
+    }
+    catch (error)
+    {
+        console.log(`ERROR WHILE SENDING INQUIRY TO AI MODEL, ${error.message}, ${error}`)
+        return null;
+    }
+}
+
+
+export default {analyseMessageType, wsAuth, getNews, sendInquiryToModel}

@@ -22,6 +22,7 @@
     "express-ws": "^5.0.2",
     "firebase-admin": "^11.11.0",
     "get-root-path": "^2.0.2",
+    "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "mailersend": "^2.2.0",
     "moment": "^2.29.4",

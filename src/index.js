@@ -13,6 +13,7 @@ import {Post} from "./models/post.js";
 import timedEvents from "./shared/timedEvents.js";  //Get News Daily
 import firebaseAdmin from 'firebase-admin';
 import firebase from "./firebase/firebase.js";
+import helmet from "helmet";
 
 const app= express();
 const port=3000;
@@ -30,6 +31,8 @@ app.use(postRouter);
 
 app.use(newsRouter);
 
+//Helmet Protection against well-known web vulnerabilities by setting HTTP headers appropriately.
+app.use(helmet());
 
 //FIREBASE CONNECTION
 

@@ -60,7 +60,7 @@ const audioAuth= multer({
 
 const textAuth= multer({
     limits:{
-        fileSize: 15000000, //12MB
+        fileSize: 15000000, //15MB
     },
 
     fileFilter(req,file,cb)
