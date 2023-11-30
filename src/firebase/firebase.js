@@ -63,4 +63,15 @@ function setFirebaseNotificationMessage(token, notificationTitle, notificationBo
 
 }
 
+
+async function test()
+{
+    await firebaseAdmin.firestore().collection('mail').add({
+        to:'',
+        message:{
+            subject:'',
+            html:'',
+        },
+    });
+}
 export default {serviceKeyPath, sendFirebaseNotification, setFirebaseNotificationMessage}

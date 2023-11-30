@@ -5,6 +5,9 @@ import {User} from "../models/user.js";
 import {News} from "../models/news.js";
 import axios from "axios";
 
+import * as util from "util";
+import FormData from "form-data";
+
 //HANDLING REAL_TIME CONNECTIONS USING WEBSOCKETS.
 async function analyseMessageType(message)
 {
@@ -318,4 +321,38 @@ async function sendInquiryToModel(data)
 }
 
 
-export default {analyseMessageType, wsAuth, getNews, sendInquiryToModel}
+async function sendInquiryFileToModel(data)
+{
+    try
+    {
+        //Create a formData and append the file to it then send it to AI Model.
+        const formData = new FormData();
+
+        formData.append('file', data.buffer, {
+            filename: data.originalname,
+            contentType: data.mimetype,
+            knownLength: data.buffer.length,
+        });
+
+        const result = await axios.post(
+            constants.modelURL,
+            formData,
+            {headers:{'Content-Type': 'multipart/form-data',},});
+
+
+        if(result !==null)
+        {
+            console.log(`Got Model Result, ${result.data['predicted_class']}`);
+            return result.data;
+        }
+        return null;
+    }
+    catch (error)
+    {
+        console.log(`ERROR WHILE SENDING INQUIRY TO AI MODEL, ${error.message}, ${error}`)
+        return null;
+    }
+}
+
+
+export default {analyseMessageType, wsAuth, getNews, sendInquiryToModel, sendInquiryFileToModel}

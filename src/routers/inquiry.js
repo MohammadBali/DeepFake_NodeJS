@@ -2,7 +2,6 @@ import express from "express";
 import auth from "../middleware/auth.js";
 import {Inquiry} from "../models/inquiry.js";
 import components from "../shared/components.js";
-
 const router= express.Router();
 
 //Add a Text Inquiry, expecting an image which keyword name is 'text'
@@ -14,7 +13,9 @@ router.post('/addTextInquiry',auth.userAuth, auth.textAuth.single('text'),async 
     {
         const textBuffer= req.file.buffer.toString('base64');
 
-        const modelResult = await components.sendInquiryToModel(req.file.buffer.toString()); //Send File to AI Model and get the results back
+        //const modelResult = await components.sendInquiryToModel(req.file.buffer.toString()); //Send File to AI Model and get the results back
+
+        const modelResult = await components.sendInquiryFileToModel(req.file); //Send File to AI Model and get the results back
 
         if(modelResult ==null)
         {
@@ -48,7 +49,7 @@ router.post('/addTextInquiry',auth.userAuth, auth.textAuth.single('text'),async 
     }
 
     catch (e) {
-        console.log(`Could not Add Inquiry, ${e}`);
+        console.log(`Could not Add Inquiry, ${e.stack}`);
         res.status(500).send(e);
     }
 }, (error, req, res, next)=> {
