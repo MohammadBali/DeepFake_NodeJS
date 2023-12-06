@@ -4,8 +4,6 @@ import constants from "./constants.js";
 import {User} from "../models/user.js";
 import {News} from "../models/news.js";
 import axios from "axios";
-
-import * as util from "util";
 import FormData from "form-data";
 
 //HANDLING REAL_TIME CONNECTIONS USING WEBSOCKETS.

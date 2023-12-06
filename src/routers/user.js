@@ -264,7 +264,10 @@ router.get('/getSubscriptions', auth.userAuth, async(req,res)=>{
     {
         await req.user.populate('subscribedUsers');
 
-        res.status(201).send({subscriptions:req.user.subscriptions});
+        //await req.user.populate({path:'subscriptions.owner_id', model:'User', select: {'owner_id':1, 'photo':1, 'name':1, 'last_name':1}});
+
+        res.status(200).send({subscriptions:req.user.subscriptions});
+
     }
     catch (e) {
         console.log(`ERROR WHILE GETTING SUBSCRIPTIONS, ${e.toString()}`);
@@ -273,6 +276,19 @@ router.get('/getSubscriptions', auth.userAuth, async(req,res)=>{
 
 });
 
+
+router.get('/getSubscriptionsDetails', auth.userAuth, async(req,res)=>{
+
+    try
+    {
+        await req.user.populate('subscriptions.owner_id');
+        res.status(200).send({subscriptions:req.user.subscriptions});
+    }
+    catch (e) {
+        console.log(`ERROR WHILE GETTING SUBSCRIPTIONS DETAILS, ${e.toString()}`);
+        res.status(500).send(e);
+    }
+});
 
 
 export default router
