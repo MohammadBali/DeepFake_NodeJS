@@ -2,8 +2,10 @@ import express from "express";
 import auth from "../middleware/auth.js";
 import {Post} from "../models/post.js";
 import {User} from "../models/user.js";
+import firebase from "../firebase/firebase.js";
 
 const router= express.Router();
+
 //Add Post
 router.post('/addPost',auth.userAuth, async (req, res)=>{
 
@@ -17,6 +19,33 @@ router.post('/addPost',auth.userAuth, async (req, res)=>{
 
         await p.save();
         res.status(201).send({p});
+
+
+        //Send Firebase Notification
+
+        const subscribedUsers= await User.find({'subscriptions.owner_id':req.user._id}); //Find All the users who are subscribed to the user who shared the post
+
+        if(subscribedUsers !== null)
+        {
+            for (let user of subscribedUsers)
+            {
+                //Check if they are connected to any device, aka has a firebase Token
+                if(user.firebaseTokens != null)
+                {
+                    //console.log(`FirebaseToken is ${user.firebaseTokens}`);
+                    const message=firebase.setFirebaseNotificationMessage(
+                        user.firebaseTokens,
+                        `${req.user.name} ${req.user.last_name} has shared a new post!`,
+                        `"${p.title}", Check it now`,
+                        {
+                            'post_id':`${p._id}`,
+                        },
+
+                    );
+                    firebase.sendFirebaseNotification(message);
+                }
+            }
+        }
 
     }
     catch (e) {

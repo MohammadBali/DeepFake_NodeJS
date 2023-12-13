@@ -276,7 +276,7 @@ router.get('/getSubscriptions', auth.userAuth, async(req,res)=>{
 
 });
 
-
+//Return the details of the subscribed users
 router.get('/getSubscriptionsDetails', auth.userAuth, async(req,res)=>{
 
     try
