@@ -1,3 +1,6 @@
 1. Connect to database: D:/src/MongoDB/mongodb/bin/mongod.exe --dbpath=D:/src/MongoDB/mongodatabases
 
 2. Run Nodemon from dev: npm run dev
+
+
+3. For Ngrok connection via cmd: ngrok http --domain=conversely-inviting-gelding.ngrok-free.app 3000

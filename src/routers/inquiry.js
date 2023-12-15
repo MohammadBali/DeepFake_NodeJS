@@ -27,7 +27,7 @@ router.post('/addTextInquiry',auth.userAuth, auth.textAuth.single('text'),async 
         const inquiry= new Inquiry({
             name:req.body.name,
             type:req.body.type,
-            data:textBuffer, //Data is String
+            data:textBuffer, //Data is base64 String
             owner:req.user._id,
             result:modelResult['predicted_class'] === "machine generated" ? 'fake' : 'real', //Different word usage for storing if it's fake or not
         });
@@ -56,6 +56,57 @@ router.post('/addTextInquiry',auth.userAuth, auth.textAuth.single('text'),async 
     res.status(400).send({error: error.message});
 });
 
+//Add an Image Audio, expecting an image which keyword name is 'image'
+router.post('/addAudioInquiry',auth.userAuth, auth.audioAuth.single('audio'), async (req, res)=>{
+
+    console.log('Getting Audio Data');
+    try{
+        const audioBuffer= req.file.buffer.toString('base64');
+
+        // const modelResult = await components.sendAudioFileToModel(req.file); //Send Audio File to AI Model and get the results back
+        //
+        // if(modelResult ==null)
+        // {
+        //     console.log(`Audio Model Result is empty, ${modelResult}`);
+        //
+        //     return res.status(400).send({error:'Model result was empty'});
+        // }
+
+
+        const inquiry= new Inquiry({
+            name:req.body.name,
+            type:req.body.type,
+            data:audioBuffer, //Data is base64 String
+            owner:req.user._id,
+            result:req.body.result,
+            //result:modelResult['predicted_class'] === "machine generated" ? 'fake' : 'real', //Different word usage for storing if it's fake or not
+        });
+
+        await inquiry.save();
+
+        res.status(201).send({
+            inquiry:
+                {
+                    name:inquiry.name,
+                    type:inquiry.type,
+                    owner:inquiry.owner,
+                    _id:inquiry._id,
+                    result:inquiry.result,
+                    createdAt:inquiry.createdAt,
+                    updatedAt:inquiry.updatedAt,
+                    data:inquiry.data,
+                },
+        });
+    }
+    catch (e) {
+        console.log(`Could not Add Audio Inquiry, ${e}`);
+        res.status(500).send(e);
+    }
+}, (error, req, res, next)=> {
+    res.status(400).send({error: error.message});
+});
+
+
 //Add an Image Inquiry, expecting an image which keyword name is 'image'
 router.post('/addImageInquiry',auth.userAuth, auth.imageAuth.single('image'), async (req, res)=>{
 
@@ -82,34 +133,6 @@ router.post('/addImageInquiry',auth.userAuth, auth.imageAuth.single('image'), as
 {
     res.status(400).send({error:error.message}); //Error Handler for Multer too.
 });
-
-
-//Add an Image Audio, expecting an image which keyword name is 'image'
-router.post('/addAudioInquiry',auth.userAuth, auth.audioAuth.single('audio'), async (req, res)=>{
-
-
-    try{
-        const audioBuffer= req.file.buffer;
-        const inquiry= new Inquiry({
-            name:req.body.name,
-            type:req.body.type,
-            data:audioBuffer, //Data is ImageBuffer
-            owner:req.user._id,
-            result:req.body.result,
-        });
-
-        await inquiry.save();
-
-        res.status(201).send({inquiry});
-    }
-    catch (e) {
-        console.log(`Could not Add Audio Inquiry, ${e}`);
-        res.status(500).send(e);
-    }
-}, (error, req, res, next)=> {
-    res.status(400).send({error: error.message});
-});
-
 
 
 //Send All Inquiries in Database

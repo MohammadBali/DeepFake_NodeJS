@@ -41,10 +41,10 @@ const imageAuth= multer({
 });
 
 
-//Audio Authenticator, if audio file is larger than 12 MB => Error, if audio type is not (mp3,wav,m4a,flac) => Error
+//Audio Authenticator, if audio file is larger than 50 MB => Error, if audio type is not (mp3,wav,m4a,flac) => Error
 const audioAuth= multer({
     limits:{
-        fileSize: 12000000, //12MB
+        fileSize: 50000000, //50MB
     },
 
     fileFilter(req,file,cb)

@@ -51,29 +51,45 @@ async function AddLike({userID, postID})
             return -1;
         }
 
-        let elementIndex = -1;
+        //let elementIndex = -1;
+
+        let elementIndexList=[];
 
         //If Like already exists =>  remove it.
         for (const e of p.likes) {
-            //console.log(`in posts.likes, current like ID is ${e._id},`);
             if (e.owner.toString() === userID) {
-                elementIndex=p.likes.indexOf(e);
+
+                //elementIndex=p.likes.indexOf(e);
+
+                console.log(`Found User to remove his like, like id is: ${e._id}`);
+
+                elementIndexList.push(e); //add the element index to the list to be removed later on
                 break;
-                // p.likes.splice(p.likes.indexOf(e));
-                // await p.save();
-                // return p;
             }
         }
 
         //User Has Liked that post => Remove it and return posts.
-        if (elementIndex !== -1)
+        if(elementIndexList.length >0)
         {
-            console.log('User has already liked this post, unliking it now...');
-            p.likes.splice(p.likes[elementIndex],1);
-            await p.save();
+            for(const element of elementIndexList)
+            {
+                //p.likes.splice(p.likes[element],1);
 
+                p.likes = p.likes.filter(item => !elementIndexList.includes(item) );
+            }
+
+            await p.save();
             return p;
         }
+
+        // if (elementIndex !== -1)
+        // {
+        //     console.log('User has already liked this post, unliking it now...');
+        //     p.likes.splice(p.likes[elementIndex],1);
+        //     await p.save();
+        //
+        //     return p;
+        // }
 
         else
         {
@@ -295,30 +311,30 @@ async function storeNews(result)
     }
 }
 
+// //Send Inquiry to AI Model and get the result back
+// async function sendInquiryToModel(data)
+// {
+//
+//     try
+//     {
+//         //console.log(`Data to send: ${data}`);
+//         const result = await axios.post(constants.modelURL, {'text':data});
+//
+//         if(result !==null)
+//         {
+//             console.log(`Got Model Result, ${result.data['predicted_class']}`);
+//             return result.data;
+//         }
+//         return null;
+//     }
+//     catch (error)
+//     {
+//         console.log(`ERROR WHILE SENDING INQUIRY TO AI MODEL, ${error.message}, ${error}`)
+//         return null;
+//     }
+// }
+
 //Send Inquiry to AI Model and get the result back
-async function sendInquiryToModel(data)
-{
-
-    try
-    {
-        //console.log(`Data to send: ${data}`);
-        const result = await axios.post(constants.modelURL, {'text':data});
-
-        if(result !==null)
-        {
-            console.log(`Got Model Result, ${result.data['predicted_class']}`);
-            return result.data;
-        }
-        return null;
-    }
-    catch (error)
-    {
-        console.log(`ERROR WHILE SENDING INQUIRY TO AI MODEL, ${error.message}, ${error}`)
-        return null;
-    }
-}
-
-
 async function sendInquiryFileToModel(data)
 {
     try
@@ -353,4 +369,39 @@ async function sendInquiryFileToModel(data)
 }
 
 
-export default {analyseMessageType, wsAuth, getNews, sendInquiryToModel, sendInquiryFileToModel}
+//Send Audio Inquiry to AI Model and get the result back
+async function sendAudioFileToModel(data)
+{
+    try
+    {
+        //Create a formData and append the file to it then send it to AI Model.
+        const formData = new FormData();
+
+        formData.append('file', data.buffer, {
+            filename: data.originalname,
+            contentType: data.mimetype,
+            knownLength: data.buffer.length,
+        });
+
+        const result = await axios.post(
+            constants.audioModelURL, // TO BE FILLED WITH CORRECT URL
+            formData,
+            {headers:{'Content-Type': 'multipart/form-data',},});
+
+
+        if(result !==null)
+        {
+            console.log(`Got Audio Model Result, ${result.data['predicted_class']}`);
+            return result.data;
+        }
+        return null;
+    }
+    catch (error)
+    {
+        console.log(`ERROR WHILE SENDING AUDIO INQUIRY TO AI MODEL, ${error.message}, ${error}`)
+        return null;
+    }
+}
+
+
+export default {analyseMessageType, wsAuth, getNews, sendInquiryFileToModel, sendAudioFileToModel}

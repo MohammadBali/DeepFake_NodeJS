@@ -27,23 +27,28 @@ router.post('/addPost',auth.userAuth, async (req, res)=>{
 
         if(subscribedUsers !== null)
         {
-            for (let user of subscribedUsers)
-            {
-                //Check if they are connected to any device, aka has a firebase Token
-                if(user.firebaseTokens != null)
+            try {
+                for (let user of subscribedUsers)
                 {
-                    //console.log(`FirebaseToken is ${user.firebaseTokens}`);
-                    const message=firebase.setFirebaseNotificationMessage(
-                        user.firebaseTokens,
-                        `${req.user.name} ${req.user.last_name} has shared a new post!`,
-                        `"${p.title}", Check it now`,
-                        {
-                            'post_id':`${p._id}`,
-                        },
+                    //Check if they are connected to any device, aka has a firebase Token
+                    if(user.firebaseTokens != null)
+                    {
+                        //console.log(`FirebaseToken is ${user.firebaseTokens}`);
+                        const message=firebase.setFirebaseNotificationMessage(
+                            user.firebaseTokens,
+                            `${req.user.name} ${req.user.last_name} has shared a new post!`,
+                            `"${p.title}", Check it now`,
+                            {
+                                'post_id':`${p._id}`,
+                            },
 
-                    );
-                    firebase.sendFirebaseNotification(message);
+                        );
+                        firebase.sendFirebaseNotification(message);
+                    }
                 }
+            }
+            catch (e) {
+                console.log(`Error while sending firebase notification, ${e.message}`);
             }
         }
 
