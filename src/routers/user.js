@@ -30,7 +30,7 @@ router.post('/addUser',async (req,res)=>{
 
     catch (e) {
         console.log(`Error While Adding a user, ${e}`);
-        res.status(400).send({error:"Couldn't Sign you", message:e , success:0});
+        res.status(400).send({error:"Couldn't Sign you", message:e.message , success:0});
     }
 });
 

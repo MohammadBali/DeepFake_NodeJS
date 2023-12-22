@@ -192,6 +192,7 @@ router.post('/AddLike',auth.userAuth, async(req, res)=>{
 });
 
 
+//Get the User's Subscriptions Posts
 router.get('/getSubscriptionsPosts', auth.userAuth, async(req,res)=>
 {
     const limit=10;

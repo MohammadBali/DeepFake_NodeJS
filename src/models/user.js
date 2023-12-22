@@ -242,7 +242,8 @@ userSchema.methods.addFirebaseToken= async function(token)
     }
     catch (e)
     {
-        throw Error(`ERROR WHILE ADDING FIREBASE TOKEN, ${e}`);
+        console.log(`ERROR WHILE ADDING FIREBASE TOKEN, ${e}`);
+        throw Error(`${e}`);
     }
 
 
