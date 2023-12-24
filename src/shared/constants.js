@@ -8,4 +8,6 @@ const modelURL='http://ec2-3-120-39-18.eu-central-1.compute.amazonaws.com:8000/p
 
 const audioModelURL='';
 
-export default  {SignKey, gNewsAPI, gNewsURL, modelURL, audioModelURL}
+const imageModelURL='';
+
+export default  {SignKey, gNewsAPI, gNewsURL, modelURL, audioModelURL, imageModelURL}

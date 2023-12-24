@@ -403,5 +403,38 @@ async function sendAudioFileToModel(data)
     }
 }
 
+//Send Image Inquiry to AI Model and get the results back
+async function sendImageFileToModel(data)
+{
+    try
+    {
+        //Create a formData and append the file to it then send it to AI Model.
+        const formData = new FormData();
 
-export default {analyseMessageType, wsAuth, getNews, sendInquiryFileToModel, sendAudioFileToModel}
+        formData.append('file', data.buffer, {
+            filename: data.originalname,
+            contentType: data.mimetype,
+            knownLength: data.buffer.length,
+        });
+
+        const result = await axios.post(
+            constants.imageModelURL, // TO BE FILLED WITH CORRECT URL
+            formData,
+            {headers:{'Content-Type': 'multipart/form-data',},});
+
+
+        if(result !==null)
+        {
+            console.log(`Got Image Model Result, ${result.data['predicted_class']}`);
+            return result.data;
+        }
+        return null;
+    }
+    catch (error)
+    {
+        console.log(`ERROR WHILE SENDING IMAGE INQUIRY TO AI MODEL, ${error.message}, ${error}`)
+        return null;
+    }
+}
+
+export default {analyseMessageType, wsAuth, getNews, sendInquiryFileToModel, sendAudioFileToModel, sendImageFileToModel}

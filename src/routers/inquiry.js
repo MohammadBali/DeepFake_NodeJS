@@ -4,7 +4,7 @@ import {Inquiry} from "../models/inquiry.js";
 import components from "../shared/components.js";
 const router= express.Router();
 
-//Add a Text Inquiry, expecting an image which keyword name is 'text'
+//Add a Text Inquiry, expecting a text file
 router.post('/addTextInquiry',auth.userAuth, auth.textAuth.single('text'),async (req, res)=>{
 
     console.log('Getting Text Data');
@@ -56,7 +56,7 @@ router.post('/addTextInquiry',auth.userAuth, auth.textAuth.single('text'),async 
     res.status(400).send({error: error.message});
 });
 
-//Add an Image Audio, expecting an image which keyword name is 'image'
+//Add an Audio Inquiry, expecting an audio file
 router.post('/addAudioInquiry',auth.userAuth, auth.audioAuth.single('audio'), async (req, res)=>{
 
     console.log('Getting Audio Data');
@@ -106,24 +106,47 @@ router.post('/addAudioInquiry',auth.userAuth, auth.audioAuth.single('audio'), as
     res.status(400).send({error: error.message});
 });
 
-
-//Add an Image Inquiry, expecting an image which keyword name is 'image'
+//Add an Image Inquiry, expecting an image file
 router.post('/addImageInquiry',auth.userAuth, auth.imageAuth.single('image'), async (req, res)=>{
 
+    console.log('Getting Image Data');
     try{
-        const imageBuffer= req.file.buffer;
+        const imageBuffer= req.file.buffer.toString('base64');
+
+        // const modelResult = await components.sendImageFileToModel(req.file); //Send Audio File to AI Model and get the results back
+        //
+        // if(modelResult ==null)
+        // {
+        //     console.log(`Image Model Result is empty, ${modelResult}`);
+        //
+        //     return res.status(400).send({error:'Image Model result was empty'});
+        // }
+
 
         const inquiry= new Inquiry({
             name:req.body.name,
             type:req.body.type,
-            data:imageBuffer, //Data is ImageBuffer
+            data:imageBuffer, //Data is base64 String
             owner:req.user._id,
             result:req.body.result,
+            //result:modelResult['predicted_class'] === "machine generated" ? 'fake' : 'real', //Different word usage for storing if it's fake or not
         });
 
         await inquiry.save();
 
-        res.status(201).send({inquiry});
+        res.status(201).send({
+            inquiry:
+                {
+                    name:inquiry.name,
+                    type:inquiry.type,
+                    owner:inquiry.owner,
+                    _id:inquiry._id,
+                    result:inquiry.result,
+                    createdAt:inquiry.createdAt,
+                    updatedAt:inquiry.updatedAt,
+                    data:inquiry.data,
+                },
+        });
     }
     catch (e) {
         console.log(`Could not Add Image Inquiry, ${e}`);
@@ -133,7 +156,6 @@ router.post('/addImageInquiry',auth.userAuth, auth.imageAuth.single('image'), as
 {
     res.status(400).send({error:error.message}); //Error Handler for Multer too.
 });
-
 
 //Send All Inquiries in Database
 router.get('/inquiries',async (req,res)=>{
@@ -166,7 +188,6 @@ router.get('/inquiries/me',auth.userAuth, async (req, res)=>{
         res.status(500).send(e);
     }
 });
-
 
 //Delete an Inquiry
 router.delete('/inquiries/delete/:id',auth.userAuth,async (req, res)=>{

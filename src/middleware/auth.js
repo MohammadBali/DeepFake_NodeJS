@@ -27,7 +27,7 @@ const userAuth= async(req, res, next)=>{
 //Image Authenticator, if image is larger than 5 MB => Error, if image type is not (jpg,jpeg,png) => Error
 const imageAuth= multer({
     limits:{
-        fileSize:500000, //5 MB
+        fileSize:10000000, //10 MB
     },
 
     fileFilter(req,file,cb)
@@ -36,6 +36,12 @@ const imageAuth= multer({
         {
             return cb(new Error('Image Type is incorrect'));
         }
+
+        if(file.size >10000000)
+        {
+            return cb(new Error('Image File Size is larger than 10 MB'));
+        }
+
         cb(undefined,true);
     }
 });
@@ -44,7 +50,7 @@ const imageAuth= multer({
 //Audio Authenticator, if audio file is larger than 50 MB => Error, if audio type is not (mp3,wav,m4a,flac) => Error
 const audioAuth= multer({
     limits:{
-        fileSize: 50000000, //50MB
+        fileSize: 20000000, //20MB
     },
 
     fileFilter(req,file,cb)
@@ -53,6 +59,12 @@ const audioAuth= multer({
         {
             return cb(new Error('Audio Type is incorrect'));
         }
+
+        if(file.size >20000000)
+        {
+            return cb(new Error('Audio File Size is larger than 20 MB'));
+        }
+
         cb(undefined,true);
     },
 });
@@ -72,7 +84,7 @@ const textAuth= multer({
 
         if(file.size >15000000)
         {
-            return cb(new Error('File Size is larger than 15 MB'));
+            return cb(new Error('Text File Size is larger than 15 MB'));
         }
         cb(undefined,true);
     },

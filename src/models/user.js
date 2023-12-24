@@ -178,7 +178,7 @@ userSchema.pre('save',async function (next){
     next(); //Call it so Mongoose knows we are done doing the Middleware work
 });
 
-//Deleting User's inquiries before removing them
+//Deleting User's inquiries and posts and comments before removing them
 userSchema.pre('findOneAndDelete', async function(next)
 {
     const u= await User.findOne(this.getQuery());
@@ -186,6 +186,20 @@ userSchema.pre('findOneAndDelete', async function(next)
     console.log(`User ID to be Deleted: ${u._id}`);
     await Inquiry.deleteMany({owner:u._id});
     await Post.deleteMany({owner:u._id});
+
+    // Remove user's comments from all posts
+    await Post.updateMany(
+        { 'comments.owner': u._id }, // Find posts where the user has comments
+        { $pull: { comments: { owner: u._id } } } // Remove comments by the user to be deleted
+    );
+
+    // Remove user's likes from all posts
+    await Post.updateMany(
+        { 'likes.owner': u._id }, // Find posts where the user has likes
+        { $pull: { likes: { owner: u._id } } } // Remove likes by the user to be deleted
+    );
+
+
     next();
 });
 
