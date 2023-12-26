@@ -55,7 +55,7 @@ const audioAuth= multer({
 
     fileFilter(req,file,cb)
     {
-        if(!file.originalname.match(/\.(mp3|wav|m4a|flac)$/))
+        if(!file.originalname.match(/\.(mp3|wav|rm|)$/))
         {
             return cb(new Error('Audio Type is incorrect'));
         }

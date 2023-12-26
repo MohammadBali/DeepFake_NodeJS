@@ -199,6 +199,12 @@ userSchema.pre('findOneAndDelete', async function(next)
         { $pull: { likes: { owner: u._id } } } // Remove likes by the user to be deleted
     );
 
+    //Remove this user from other user's subscriptions list
+    await User.updateMany(
+        {'subscriptions.owner_id':u._id},
+        { $pull: { subscriptions: { owner_id: u._id } } }
+    );
+
 
     next();
 });
