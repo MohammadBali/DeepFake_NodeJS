@@ -4,3 +4,7 @@
 
 
 3. For Ngrok connection via cmd: ngrok http --domain=conversely-inviting-gelding.ngrok-free.app 3000
+
+
+for memory issues (audio upload) => $ export NODE_OPTIONS=--max_old_space_size=4096
+                                    $ npm run build:static

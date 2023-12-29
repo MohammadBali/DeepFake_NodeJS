@@ -44,7 +44,7 @@ firebaseAdmin.initializeApp({
 
 
 //Get Latest News
-await timedEvents.news(); //LOCKED FOR NOW, ENABLE IT LATER ON.
+//await timedEvents.news(); //LOCKED FOR NOW, ENABLE IT LATER ON.
 
 //Set Interval to wait 24 hours.
 setInterval(timedEvents.news, timedEvents.dayInMs);
