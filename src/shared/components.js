@@ -153,24 +153,36 @@ async function deleteComment({commentID, postID})
             return -1;
         }
 
-        let elementIndex=-1;
+
+        let elementIndexList;
 
         for(const e of p.comments)
         {
             if(e._id.toString() === commentID)
             {
-                console.log(`COMMENT ID: ${e._id}`);
-                elementIndex=p.comments.indexOf(e);
+                console.log(`COMMENT ID TO BE DELETED: ${e._id}`);
+                //elementIndexList.push(e); //add the element index to the list to be removed later on
+
+                elementIndexList=e;
+
                 break;
             }
         }
 
-        if(elementIndex !== -1)
+        if(elementIndexList!==null)
         {
-            p.comments.splice(p.comments[elementIndex],1); //Remove the Comment
+            p.comments = p.comments.filter(item => elementIndexList !==item );
+
             await p.save();
             return p;
         }
+
+        // if(elementIndex !== -1)
+        // {
+        //     p.comments.splice(p.comments[elementIndex],1); //Remove the Comment
+        //     await p.save();
+        //     return p;
+        // }
         return -1;
     }
     catch (e) {
